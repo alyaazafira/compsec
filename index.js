@@ -338,6 +338,48 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
         });
     });
 // Logout
+
+/**
+ * @swagger
+ * /logout:
+ *   post:
+ *     summary: User Logout
+ *     description: Logout the user and invalidate the token
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Logged out successfully
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '500':
+ *         description: Internal Server Error - Error logging out
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '403':
+ *         description: Forbidden - Invalid or unauthorized token
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '401':
+ *         description: Unauthorized - Missing token
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '404':
+ *         description: Not Found - Invalid role
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ */
+
 app.post('/logout', authenticateToken, async (req, res) => {
     const { role } = req.user;
   
