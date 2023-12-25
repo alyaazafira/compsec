@@ -180,6 +180,50 @@ app.post('/login-staff', async (req, res) => {
     
 
     // Create appointment
+
+/**
+ * @swagger
+ * /appointments:
+ *   post:
+ *     summary: Create Appointment
+ *     description: Create a new appointment
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               company:
+ *                 type: string
+ *               purpose:
+ *                 type: string
+ *               phoneNo:
+ *                 type: string
+ *               date:
+ *                 type: string
+ *               time:
+ *                 type: string
+ *               verification:
+ *                 type: boolean
+ *               staff:
+ *                 type: object
+ *                 properties:
+ *                   username:
+ *                     type: string
+ *     responses:
+ *       '200':
+ *         description: Appointment created successfully
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '500':
+ *         description: Internal Server Error - Error creating appointment
+ */
+
     app.post('/appointments', async (req, res) => {
       const {
         name,
