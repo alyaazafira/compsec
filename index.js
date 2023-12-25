@@ -484,7 +484,7 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  * /appointments:
     get:
       summary: Get appointments
-      description: Endpoint to retrieve appointments based on optional name filter.'
+      description: Endpoint to retrieve appointments based on optional name filter.
       parameters:
         - in: query
           name: name
@@ -492,7 +492,7 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
           type: string
         - in: header
           name: Authorization
-          description: 'JWT Token for authentication'
+          description: JWT Token for authentication
           type: string
           format: 'Bearer {token}'
           required: true
@@ -500,21 +500,16 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
         - application/json
       responses:
         '200':
-          description: 'Successful retrieval of appointments'
+          description: Successful retrieval of appointments
           schema:
             type: array
             items:
               type: object
               properties:
-                // Define the properties of your appointment object here
-                // Example:
                 _id:
                   type: string
-                  example: '5feceb66ff1bac7d471ebf78'
                 name:
                   type: string
-                  example: 'John Doe'
-                // Add more properties as needed
         '403':
           description: 'Invalid or unauthorized token'
           schema:
