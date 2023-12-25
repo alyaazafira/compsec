@@ -102,6 +102,38 @@ app.post('/login-staff', async (req, res) => {
 
 
     // Security login
+/**
+ * @swagger
+ * /login-security:
+ *   post:
+ *     summary: Security Login
+ *     description: Authenticate security with username and password
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *       '401':
+ *         description: Unauthorized - Invalid credentials
+ *       '500':
+ *         description: Internal Server Error - Error storing token
+ */
     app.post('/login-security', async (req, res) => {
       const { username, password } = req.body;
 
