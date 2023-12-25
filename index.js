@@ -298,6 +298,48 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
 });
 
     // Delete appointment
+/**
+ * @swagger
+ * /appointments/{name}:
+ *   delete:
+ *     summary: Delete Appointment
+ *     description: Delete an appointment by name
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: name
+ *         required: true
+ *         description: Name of the appointment to be deleted
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Appointment deleted successfully
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '500':
+ *         description: Internal Server Error - Error deleting appointment
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '403':
+ *         description: Forbidden - Invalid or unauthorized token
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '401':
+ *         description: Unauthorized - Missing token
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ */
+
     app.delete('/appointments/:name', authenticateToken, async (req, res) => {
       const { name } = req.params;
       const { role } = req.user;
@@ -337,6 +379,8 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
           res.status(500).send('Error retrieving appointments');
         });
     });
+
+
 // Logout
 
 /**
