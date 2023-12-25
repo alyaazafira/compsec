@@ -11,7 +11,7 @@ const secretKey = 'your-secret-key';
 
 // MongoDB connection URL
 const mongoURL =
-  'mongodb+srv://alyaazafira:alyaazafira@alyaa.emy970i.mongodb.net/?retryWrites=true&w=majority';
+  'mongodb+srv://alyaazafira:<Yazap@123>@alyaa.emy970i.mongodb.net/?retryWrites=true&w=majority';
 
 // MongoDB database and collections names
 const dbName = 'appointment';
