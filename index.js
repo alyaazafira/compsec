@@ -278,6 +278,58 @@ app.post('/login-staff', async (req, res) => {
     });
 
 // Update appointment verification by visitor name
+
+/**
+ * @swagger
+ * /appointments/{name}:
+ *   put:
+ *     summary: Update Appointment Verification
+ *     description: Update the verification status of an appointment by name
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: name
+ *         required: true
+ *         description: Name of the appointment to be updated
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               verification:
+ *                 type: boolean
+ *     responses:
+ *       '200':
+ *         description: Appointment verification updated successfully
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '500':
+ *         description: Internal Server Error - Error updating appointment verification
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '403':
+ *         description: Forbidden - Invalid or unauthorized token
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '401':
+ *         description: Unauthorized - Missing token
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ */
+
 app.put('/appointments/:name', authenticateToken, async (req, res) => {
   const { name } = req.params;
   const { verification } = req.body;
