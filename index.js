@@ -479,48 +479,64 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
     });
 
     // Get all appointments (for security)
+
 /**
  * @swagger
  * /appointments:
-    get:
-      summary: Get appointments
-      description: Endpoint to retrieve appointments based on optional name filter.
-      parameters:
-        - in: query
-          name: name
-          description: Optional parameter to filter appointments by name (case-insensitive).
-          type: string
-        - in: header
-          name: Authorization
-          description: JWT Token for authentication
-          type: string
-          format: 'Bearer {token}'
-          required: true
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: Successful retrieval of appointments
-          schema:
-            type: array
-            items:
-              type: object
-              properties:
-                _id:
-                  type: string
-                name:
-                  type: string
-        '403':
-          description: 'Invalid or unauthorized token'
-          schema:
-            type: string
-            example: 'Invalid or unauthorized token'
-        '500':
-          description: 'Internal server error'
-          schema:
-            type: string
-            example: 'Error retrieving appointments'
+ *   get:
+ *     summary: Get Appointments (for security)
+ *     description: Retrieve appointments based on optional name filter, accessible only by security personnel
+ *     parameters:
+ *       - in: query
+ *         name: name
+ *         description: Optional parameter to filter appointments by name (case-insensitive)
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Appointments retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   name:
+ *                     type: string
+ *                   company:
+ *                     type: string
+ *                   purpose:
+ *                     type: string
+ *                   phoneNo:
+ *                     type: string
+ *                   date:
+ *                     type: string
+ *                     format: date
+ *                   time:
+ *                     type: string
+ *                   verification:
+ *                     type: boolean
+ *                   staff:
+ *                     type: object
+ *                     properties:
+ *                       username:
+ *                         type: string
+ *       '403':
+ *         description: Forbidden - Invalid or unauthorized token
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '500':
+ *         description: Internal Server Error - Error retrieving appointments
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
  */
+
+
     app.get('/appointments', authenticateToken, async (req, res) => {
       const { name } = req.query;
       const { role } = req.user;
