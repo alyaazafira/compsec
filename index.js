@@ -48,8 +48,6 @@ mongodb.MongoClient.connect(mongoURL, { useUnifiedTopology: true })
  * /register-staff:
  *   post:
  *     summary: Register a new staff member
- *     tags:
- *       - Staff
  *     requestBody:
  *       required: true
  *       content:
