@@ -326,6 +326,63 @@ app.post('/login-staff', async (req, res) => {
     });
 
     // Get staff's appointments
+/**
+ * @swagger
+ * /staff-appointments/{username}:
+ *   get:
+ *     summary: Get Staff Appointments
+ *     description: Retrieve appointments for a specific staff member
+ *     parameters:
+ *       - in: path
+ *         name: username
+ *         description: Username of the staff member
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Appointments retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   name:
+ *                     type: string
+ *                   company:
+ *                     type: string
+ *                   purpose:
+ *                     type: string
+ *                   phoneNo:
+ *                     type: string
+ *                   date:
+ *                     type: string
+ *                     format: date
+ *                   time:
+ *                     type: string
+ *                   verification:
+ *                     type: boolean
+ *                   staff:
+ *                     type: object
+ *                     properties:
+ *                       username:
+ *                         type: string
+ *       '403':
+ *         description: Forbidden - Invalid or unauthorized token
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       '500':
+ *         description: Internal Server Error - Error retrieving appointments
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ */
+
     app.get('/staff-appointments/:username', authenticateToken, async (req, res) => {
       const { username } = req.params;
       const { role } = req.user;
