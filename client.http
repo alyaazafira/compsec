@@ -1,0 +1,104 @@
+ 
+
+### create visitors
+POST  https://infsecurity.azurewebsites.net/register-staff
+Content-Type: application/json
+Authorization: Bearer eiyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJvYiIsInJvbGUiOiJzZWN1cml0eSIsImlhdCI6MTY4NzcwMDY3Mn0.MI7STn_YOshuXx43CYlDiSk1ZC0e4NqqB9eB_-ch8BM
+
+{
+  "username": "john",
+  "password": "123" 
+}
+
+// staff registration
+
+###
+
+POST https://infsecurity.azurewebsites.net/register-security
+Content-Type: application/json
+
+{
+  "username": "aza",
+  "password": "123" 
+}
+// security registration
+
+###
+
+POST hhttps://infsecurity.azurewebsites.net/login-staff
+Content-Type: application/json
+
+{
+  "username": "john",
+  "password": "123" 
+}
+// staff login
+
+###
+
+POST https://infsecurity.azurewebsites.net/login-security
+Content-Type: application/json
+
+{
+  "username": "aza",
+  "password": "123" 
+}
+// security login
+
+###
+
+POST https://infsecurity.azurewebsites.net/register-staff
+Content-Type: application/json
+
+{
+  "name": "alyaa",
+  "company": "ABC Corporation",
+  "purpose": "meeting",
+  "phoneNo": "011223344",
+  "date": "26-6-2023",
+  "time": "12:00AM",
+  "verification": "N/A",
+  "staff": {
+    "username": "fadh"
+  }
+}
+
+###
+
+GET https://infsecurity.azurewebsites.net/staff-appointments/john
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG4iLCJyb2xlIjoic3RhZmYiLCJpYXQiOjE2ODgwMzU4NzB9._ueT3H7k9dPccH-bX3ic0d6RYnaVs1afb-5EsYU4DLE
+
+###
+
+PUT https://infsecurity.azurewebsites.net/appointments/yat
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG4iLCJyb2xlIjoic3RhZmYiLCJpYXQiOjE2ODgwMzU4NzB9._ueT3H7k9dPccH-bX3ic0d6RYnaVs1afb-5EsYU4DLE
+Content-Type: application/json
+
+{ "verification": "verified" }
+
+###
+
+DELETE https://infsecurity.azurewebsites.net/appointments/yat
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImZhZGgiLCJyb2xlIjoic3RhZmYiLCJpYXQiOjE2ODc2ODM1NDh9.XkbTmIIEl9YSoZfuEJJCuhwDln_PU9pLrOktBOdVsok
+
+####
+
+GET https://infsecurity.azurewebsites.net/appointments?name=yat
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImF6YSIsInJvbGUiOiJzZWN1cml0eSIsImlhdCI6MTY4ODA0MDExMn0.D--F-1IAI2MFNl58awYKRe3l5qjhm5PRBTXIo2Rtls4
+
+//if security want to search spesific visitor
+###
+
+GET https://infsecurity.azurewebsites.net/appointments
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImF6YSIsInJvbGUiOiJzZWN1cml0eSIsImlhdCI6MTY4ODA0MDExMn0.D--F-1IAI2MFNl58awYKRe3l5qjhm5PRBTXIo2Rtls4
+
+//for security to view all visitor
+###
+
+POST https://infsecurity.azurewebsites.net/logout
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImF6YSIsInJvbGUiOiJzZWN1cml0eSIsImlhdCI6MTY4ODAzOTk5MH0.rablGWAgCnNEGyw52xjovDDY5-VBzR0DAOsYZScMu-A
+Content-Type: application/json
+
+{
+  "username": "fadh"
+}

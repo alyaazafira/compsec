@@ -14,7 +14,7 @@ const mongoURL =
   'mongodb+srv://alyaazafira:alyaazafira@alyaa.emy970i.mongodb.net/?retryWrites=true&w=majority';
 
 // MongoDB database and collections names
-const dbName = 'appointment';
+const dbName = 'companyappointment';
 const staffCollection = 'staff';
 const securityCollection = 'security';
 const appointmentCollection = 'appointments';
@@ -36,7 +36,8 @@ const swaggerSpec = swaggerJsdoc(options);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // MongoDB connection
-mongodb.MongoClient.connect(mongoURL, { useUnifiedTopology: true })
+//mongodb.MongoClient.connect(mongoURL, { useUnifiedTopology: true })
+mongodb.MongoClient.connect(mongoURL)
   .then((client) => {
     const db = client.db(dbName);
     const staffDB = db.collection(staffCollection);
