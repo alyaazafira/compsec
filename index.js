@@ -169,6 +169,72 @@ app.post('/login-staff', async (req, res) => {
     });
 });
 
+/**
+ * @swagger
+ * /register-security:
+ *   post:
+ *     summary: Register a new security member
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: The username of the security member
+ *               password:
+ *                 type: string
+ *                 description: The password of the security member
+ *     responses:
+ *       201:
+ *         description: Successfully registered
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: The JWT token for the registered security member
+ *       400:
+ *         description: Bad Request
+ *       500:
+ *         description: Internal Server Error
+ */
+app.post('/register-security', async (req, res) => {
+    try {
+      const { username, password } = req.body;
+  
+      // Check if the username already exists
+      const existingSecurity = await securityDB.findOne({ username });
+      if (existingSecurity) {
+        return res.status(400).json({ error: 'Username already exists' });
+      }
+  
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10);
+  
+      // Create a new security member
+      const newSecurity = await securityDB.insertOne({
+        username,
+        password: hashedPassword,
+      });
+  
+      // Generate JWT token
+      const token = jwt.sign({ username, role: 'security' }, secretKey);
+  
+      // Update the security member with the token
+      await securityDB.updateOne({ username }, { $set: { token } });
+  
+      res.status(201).json({ token });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  
 
     // Security login
 /**

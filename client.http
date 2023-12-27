@@ -1,38 +1,40 @@
  
-
-### create visitors
+//create staff
+### 
 POST  https://infsecurity.azurewebsites.net/register-staff
 Content-Type: application/json
-Authorization: Bearer eiyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJvYiIsInJvbGUiOiJzZWN1cml0eSIsImlhdCI6MTY4NzcwMDY3Mn0.MI7STn_YOshuXx43CYlDiSk1ZC0e4NqqB9eB_-ch8BM
+Authorization: Bearer 
 
 {
   "username": "john",
   "password": "123" 
 }
 
-// staff registration
 
+// login staff
 ###
 
-POST https://infsecurity.azurewebsites.net/register-security
-Content-Type: application/json
-
-{
-  "username": "aza",
-  "password": "123" 
-}
-// security registration
-
-###
-
-POST hhttps://infsecurity.azurewebsites.net/login-staff
+POST https://infsecurity.azurewebsites.net/login-staff
 Content-Type: application/json
 
 {
   "username": "john",
   "password": "123" 
 }
-// staff login
+
+//create security
+### 
+POST  https://infsecurity.azurewebsites.net/register-security
+Content-Type: application/json
+//Authorization: Bearer 
+
+{
+  "username": "apiz",
+  "password": "1234" 
+}
+
+
+// security login
 
 ###
 
@@ -40,18 +42,18 @@ POST https://infsecurity.azurewebsites.net/login-security
 Content-Type: application/json
 
 {
-  "username": "aza",
+  "username": "apizz",
   "password": "123" 
 }
-// security login
+
+// appointment
 
 ###
-
-POST https://infsecurity.azurewebsites.net/register-staff
+POST https://infsecurity.azurewebsites.net/appointments
 Content-Type: application/json
 
 {
-  "name": "alyaa",
+  "name": "apizz",
   "company": "ABC Corporation",
   "purpose": "meeting",
   "phoneNo": "011223344",
@@ -62,7 +64,7 @@ Content-Type: application/json
     "username": "fadh"
   }
 }
-
+//staff appointment
 ###
 
 GET https://infsecurity.azurewebsites.net/staff-appointments/john
