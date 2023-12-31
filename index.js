@@ -44,27 +44,54 @@ mongodb.MongoClient.connect(mongoURL)
     const securityDB = db.collection(securityCollection);
     const appointmentDB = db.collection(appointmentCollection);
 
+// Middleware for authentication and authorization (specifically for security role)
+const authenticateTokenForSecurity = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Missing token' });
+  }
+
+  jwt.verify(token, secretKey, (err, user) => {
+    if (err || user.role !== 'security') {
+      return res.status(403).json({ error: 'Invalid or unauthorized token' });
+    }
+    req.user = user;
+    next();
+  });
+};
+
 /**
  * @swagger
  * /register-staff:
  *   post:
- *     summary: Register a new staff member
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *                 description: The username of the staff member
- *               password:
- *                 type: string
- *                 description: The password of the staff member
+ *     summary: Register a new staff member (Security Authorization Required).
+ *     parameters:
+ *       - in: header
+ *         name: authorization
+ *         type: string
+ *         required: true
+ *         description: The security token for authorization.
+ *       - in: body
+ *         name: body
+ *         description: Staff registration details.
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             username:
+ *               type: string
+ *               description: The username for the new staff member.
+ *             password:
+ *               type: string
+ *               description: The password for the new staff member.
+ *           required:
+ *             - username
+ *             - password
  *     responses:
  *       201:
- *         description: Successfully registered
+ *         description: Successfully registered a new staff member.
  *         content:
  *           application/json:
  *             schema:
@@ -72,45 +99,77 @@ mongodb.MongoClient.connect(mongoURL)
  *               properties:
  *                 token:
  *                   type: string
- *                   description: The JWT token for the registered staff member
  *       400:
- *         description: Bad Request
+ *         description: Bad request, username already exists.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *       401:
+ *         description: Unauthorized, invalid security token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Invalid security token
+ *       403:
+ *         description: Forbidden, only security can register new staff.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Permission denied
  *       500:
- *         description: Internal Server Error
+ *         description: Internal Server Error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Internal Server Error
  */
-app.post('/register-staff', async (req, res) => {
-    try {
-      const { username, password } = req.body;
-  
-      // Check if the username already exists
-      const existingStaff = await staffDB.findOne({ username });
-      if (existingStaff) {
-        return res.status(400).json({ error: 'Username already exists' });
-      }
-  
-      // Hash the password
-      const hashedPassword = await bcrypt.hash(password, 10);
-  
-      // Create a new staff member
-      const newStaff = await staffDB.create({
-        username,
-        password: hashedPassword,
-      });
-  
-      // Generate JWT token
-      const token = jwt.sign({ username, role: 'staff' }, secretKey);
-  
-      // Update the staff member with the token
-      await staffDB.updateOne({ username }, { $set: { token } });
-  
-      res.status(201).json({ token });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Internal Server Error' });
+app.post('/register-staff', authenticateTokenForSecurity, async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    // Check if the username already exists
+    const existingStaff = await staffDB.findOne({ username });
+    if (existingStaff) {
+      return res.status(400).json({ error: 'Username already exists' });
     }
-  });
-    
-        
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new staff member
+    const newStaff = await staffDB.insertOne({
+      username,
+      password: hashedPassword,
+    });
+
+    // Generate JWT token
+    const token = jwt.sign({ username, role: 'staff' }, secretKey);
+
+    // Update the staff member with the token
+    await staffDB.updateOne({ username }, { $set: { token } });
+
+    res.status(201).json({ token });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
     // Staff login
 
@@ -269,6 +328,7 @@ app.post('/register-security', async (req, res) => {
  *       '500':
  *         description: Internal Server Error - Error storing token
  */
+
     app.post('/login-security', async (req, res) => {
       const { username, password } = req.body;
 

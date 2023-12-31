@@ -3,7 +3,7 @@
 ### 
 POST  https://infsecurity.azurewebsites.net/register-staff
 Content-Type: application/json
-Authorization: Bearer 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFwaXoiLCJyb2xlIjoic2VjdXJpdHkiLCJpYXQiOjE3MDM3NDIzNTB9.iZPnwuGDwHeH5NiX6P1HN_KPupZET6hz9G8TpaTk-ZY
 
 {
   "username": "john",
@@ -29,7 +29,7 @@ Content-Type: application/json
 //Authorization: Bearer 
 
 {
-  "username": "apiz",
+  "username": "ALYAA",
   "password": "1234" 
 }
 
