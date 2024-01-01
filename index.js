@@ -66,7 +66,7 @@ const authenticateTokenForSecurity = (req, res, next) => {
  * @swagger
  * /register-staff:
  *   post:
- *     summary: Register a new staff member (Security Authorization Required).
+ *     summary: Register a new staff (Security Authorization Required).
  *     parameters:
  *       - in: header
  *         name: authorization
