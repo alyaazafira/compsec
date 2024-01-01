@@ -67,8 +67,8 @@ const authenticateTokenForSecurity = (req, res, next) => {
  * /register-staff:
  *   post:
  *     summary: Register a new staff (Security Authorization Required).
- *    security:
- *        - BearerAuth: []
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: header
  *         name: authorization
