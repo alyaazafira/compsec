@@ -63,7 +63,7 @@ const authenticateTokenForSecurity = (req, res, next) => {
 };
 
 /**
- * @swagger
+ @swagger
  * /register-staff:
  *   post:
  *     summary: Register a new staff (Security Authorization Required).
@@ -179,6 +179,7 @@ app.post('/register-staff', authenticateTokenForSecurity, async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
     // Staff login
 
