@@ -63,23 +63,22 @@ const authenticateTokenForSecurity = (req, res, next) => {
 };
 
 /**
+ *@Swagger
+ *components:
+ *bearerAuth:
+ *    typeAuth:
+ *    scheme: bearer
+ *    bearerFormat:JWT
+ */
+
+/**
  @swagger
  * /register-staff:
  *   post:
  *     summary: Register a new staff (Security Authorization Required).
  *     security:
  *       - BearerAuth: []
- *     components:
- *       securitySchemes:
- *         BearerAuth:
- *           type: http
- *           scheme: bearer
  *     parameters:
- *       - in: header
- *         name: authorization
- *         type: string
- *         required: true
- *         description: The security token for authorization.
  *       - in: body
  *         name: body
  *         description: Staff registration details.
@@ -469,7 +468,9 @@ app.post('/register-security', async (req, res) => {
  *   get:
  *     summary: Get Staff Appointments
  *     description: Retrieve appointments for a specific staff member
- *     parameters:
+ *     security:
+ *      - bearerAuth:[]
+ *      parameters:
  *       - in: path
  *         name: username
  *         description: Username of the staff member
@@ -680,10 +681,12 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  *   get:
  *     summary: Get Appointments (for security)
  *     description: Retrieve appointments based on optional name filter, accessible only by security personnel
- *     parameters:
+ *    security:
+ *      -bearerAuth:[]
+ *   parameters:
  *       - in: query
  *         name: name
- *         description: Optional parameter to filter appointments by name (case-insensitive)
+ *         description: to filter appointments by name (case-insensitive)
  *         schema:
  *           type: string
  *     responses:
