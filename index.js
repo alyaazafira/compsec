@@ -65,18 +65,33 @@ const authenticateTokenForSecurity = (req, res, next) => {
 /**
  *@Swagger
  *components:
- *bearerAuth:
+ *securitySchemes:
+ *  bearerAuth:
  *    typeAuth:
  *    scheme: bearer
  *    bearerFormat:JWT
  */
 
+ /**
+ * @swagger
+ * tags:
+ *   name: Security
+ *   description: APIs for security personnel
+ */
+
+/**
+ * @swagger
+ * tags:
+ *   name: Staff
+ *   description: APIs for staff 
+ */
 /**
  @swagger
  * /register-staff:
  *   post:
  *     summary: Register a new staff (Security Authorization Required).
- *     security:
+ *     tags:[Security]
+ *    security:
  *       - BearerAuth: []
  *     parameters:
  *       - in: body
