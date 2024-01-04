@@ -132,15 +132,14 @@ app.post('/register-staff', authenticateToken, async (req, res) => {
   }
 
   const { username, password } = req.body;
-
+   // Check if the username already exists
   const existingStaff = await staffDB.findOne({ username });
-
   if (existingStaff) {
     return res.status(409).send('Username already exists');
   }
-
+  // Hash the password
   const hashedPassword = await bcrypt.hash(password, 10);
-
+  // Create a new staff member
   const staff = {
     username,
     password: hashedPassword,
