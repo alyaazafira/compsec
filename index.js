@@ -170,17 +170,18 @@ const authenticateTokenForSecurity = (req, res, next) => {
  *                   example: Internal Server Error
  */
 app.post('/register-staff', authenticateTokenForSecurity, async (req, res) => {
+  const { role } = req.user;
+
+  if (role !== 'security') {
+    return res.status(403).json({ error: 'Permission denied' });
+  }
+
+  const { username, password } = req.body;
+
   try {
-    const { role } = req.user;
-  
-    if (role !== 'security') {
-      return res.status(403).json({ error: 'Permission denied' });
-    }
-
-    const { username, password } = req.body;
-
     // Check if the username already exists
     const existingStaff = await staffDB.findOne({ username });
+    
     if (existingStaff) {
       return res.status(400).json({ error: 'Username already exists' });
     }
@@ -204,9 +205,7 @@ app.post('/register-staff', authenticateTokenForSecurity, async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
     // Staff login
-
 /**
  * @swagger
  * /login-staff:
