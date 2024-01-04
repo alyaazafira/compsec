@@ -178,14 +178,14 @@ app.post('/register-staff', authenticateTokenForSecurity, async (req, res) => {
 
   const { username, password } = req.body;
 
-  try {
-    // Check if the username already exists
-    const existingStaff = await staffDB.findOne({ username });
-    
-    if (existingStaff) {
-      return res.status(400).json({ error: 'Username already exists' });
-    }
+  // Check if the username already exists
+  const existingStaff = await staffDB.findOne({ username });
 
+  if (existingStaff) {
+    return res.status(400).json({ error: 'Username already exists' });
+  }
+
+  try {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -205,6 +205,7 @@ app.post('/register-staff', authenticateTokenForSecurity, async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
     // Staff login
 /**
