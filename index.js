@@ -1,6 +1,6 @@
 const express = require('express');
 const mongodb = require('mongodb');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+//const { MongoClient, ServerApiVersion } = require('mongodb');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const swaggerUi = require('swagger-ui-express');
@@ -9,15 +9,15 @@ const app = express();
 
 const port = process.env.PORT || 3000;
 const secretKey = 'officevisitor';
-const credentials = 'C:/Users/User/Desktop/vms_compsec/compsec/X509-cert-2369718151529005450.pem'
+//const credentials = 'C:/Users/User/Desktop/vms_compsec/compsec/X509-cert-2369718151529005450.pem'
 
 // MongoDB connection URL
-//const mongoURL =
- // 'mongodb+srv://alyaazafira:alyaazafira@alyaa.emy970i.mongodb.net/?retryWrites=true&w=majority';
- const client = new MongoClient('mongodb+srv://alyaa.emy970i.mongodb.net/?authSource=%24external&authMechanism=MONGODB-X509&retryWrites=true&w=majority', {
+const mongoURL =
+ 'mongodb+srv://alyaazafira:alyaazafira@alyaa.emy970i.mongodb.net/?retryWrites=true&w=majority';
+ /*const client = new MongoClient('mongodb+srv://alyaa.emy970i.mongodb.net/?authSource=%24external&authMechanism=MONGODB-X509&retryWrites=true&w=majority', {
   tlsCertificateKeyFile: credentials,
   serverApi: ServerApiVersion.v1
-});
+});*/
 
   
 // MongoDB database and collections names
@@ -44,18 +44,18 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // MongoDB connection
 //mongodb.MongoClient.connect(mongoURL, { useUnifiedTopology: true })
-/*mongodb.MongoClient.connect(mongoURL)
+mongodb.MongoClient.connect(mongoURL)
   .then((client) => {
     const db = client.db(dbName);
     const staffDB = db.collection(staffCollection);
     const securityDB = db.collection(securityCollection);
-    const appointmentDB = db.collection(appointmentCollection);*/
-    client.connect()
+    const appointmentDB = db.collection(appointmentCollection);
+   /* client.connect()
     .then(() => {
       const db = client.db(dbName);
       const staffDB = db.collection(staffCollection);
       const securityDB = db.collection(securityCollection);
-      const appointmentDB = db.collection(appointmentCollection);
+      const appointmentDB = db.collection(appointmentCollection);*/
     
     // Start the server
     app.listen(port, () => {
