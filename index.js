@@ -480,6 +480,7 @@ app.post('/register-security', async (req, res) => {
  *   get:
  *     summary: Get Staff Appointments
  *     description: Retrieve appointments for a specific staff member
+ *     tags: [staff]
  *     security:
  *      - bearerAuth:[]
  *      parameters:
@@ -560,6 +561,7 @@ app.post('/register-security', async (req, res) => {
  *   put:
  *     summary: Update Appointment Verification
  *     description: Update the verification status of an appointment by name
+ *     tags:[staff]
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -631,6 +633,7 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  *   delete:
  *     summary: Delete Appointment
  *     description: Delete an appointment by name
+ *     tags: [staff]
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -693,6 +696,7 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  *   get:
  *     summary: Get Appointments (for security)
  *     description: Retrieve appointments based on optional name filter, accessible only by security personnel
+ *    tags : [security]
  *    security:
  *      -bearerAuth:[]
  *   parameters:
@@ -776,8 +780,18 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  *   post:
  *     summary: User Logout
  *     description: Logout the user and invalidate the token
+ *     tags:
+ *      - security
+ *      - staff
  *     security:
  *       - BearerAuth: []
+ *     requestBody:
+ *      content:
+ *        application/json:
+ *        schema:
+ *        type: object
+ *        properties:
+ *          //Request body properties here
  *     responses:
  *       '200':
  *         description: Logged out successfully
