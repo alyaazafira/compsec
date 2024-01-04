@@ -66,7 +66,7 @@ const authenticateTokenForSecurity = (req, res, next) => {
  *@Swagger
  *components:
  *securitySchemes:
- *  bearerAuth:
+ *  BearerAuth:
  *    type:http
  *    scheme: bearer
  *    bearerFormat:JWT
@@ -200,6 +200,7 @@ app.post('/register-staff', authenticateTokenForSecurity, async (req, res) => {
  *   post:
  *     summary: Login for Staff
  *     description: Login with username and password
+ *     tags:[staff]
  *     requestBody:
  *       required: true
  *       content:
@@ -254,6 +255,7 @@ app.post('/login-staff', async (req, res) => {
  * /register-security:
  *   post:
  *     summary: Register a new security member
+ *      tags:[security]
  *     requestBody:
  *       required: true
  *       content:
@@ -323,6 +325,7 @@ app.post('/register-security', async (req, res) => {
  *   post:
  *     summary: Security Login
  *     description: Authenticate security with username and password
+ *     tags: [security]
  *     requestBody:
  *       required: true
  *       content:
