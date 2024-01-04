@@ -54,7 +54,7 @@ const authenticateTokenForSecurity = (req, res, next) => {
   }
 
   jwt.verify(token, secretKey, (err, user) => {
-    if (err || user.role !== 'security') {
+    if (err ) {
       return res.status(403).json({ error: 'Invalid or unauthorized token' });
     }
     req.user = user;
