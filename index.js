@@ -7,7 +7,7 @@ const swaggerJsdoc = require('swagger-jsdoc');
 
 const app = express();
 const port = process.env.PORT || 3000;
-const secretKey = 'your-secret-key';
+const secretKey = 'office visitor appointment';
 
 // MongoDB connection URL
 const mongoURL =
@@ -733,71 +733,69 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
         });
     });
 
-    // Get all appointments (for security)
-
-/**
- * @swagger
- * /appointments:
- *   get:
- *     summary: Get Appointments (for security)
- *     description: Retrieve appointments based on an optional name filter, accessible only by security personnel
- *     tags:
- *       - security
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: query
- *         name: name
- *         description: Filter appointments by name (case-insensitive)
- *         schema:
- *           type: string
- *     responses:
- *       '200':
- *         description: Appointments retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   name:
- *                     type: string
- *                   company:
- *                     type: string
- *                   purpose:
- *                     type: string
- *                   phoneNo:
- *                     type: string
- *                   date:
- *                     type: string
- *                     format: date
- *                   time:
- *                     type: string
- *                   verification:
- *                     type: boolean
- *                   staff:
- *                     type: object
- *                     properties:
- *                       username:
- *                         type: string
- *       '403':
- *         description: Forbidden - Invalid or unauthorized token
- *         content:
- *           text/plain:
- *             schema:
- *               type: string
- *               example: Invalid or unauthorized token
- *       '500':
- *         description: Internal Server Error - Error retrieving appointments
- *         content:
- *           text/plain:
- *             schema:
- *               type: string
- *               example: Error retrieving appointments
- */
-
-    app.get('/appointments', authenticateToken, async (req, res) => {
+ // Get all appointments (for security)
+    /**
+     * @swagger
+     * /appointments:
+     *   get:
+     *     summary: Get Appointments (for security)
+     *     description: Retrieve appointments based on an optional name filter, accessible only by security personnel
+     *     tags:
+     *       - security
+     *     security:
+     *       - BearerAuth: []
+     *     parameters:
+     *       - in: query
+     *         name: name
+     *         description: Filter appointments by name (case-insensitive)
+     *         schema:
+     *           type: string
+     *     responses:
+     *       '200':
+     *         description: Appointments retrieved successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: array
+     *               items:
+     *                 type: object
+     *                 properties:
+     *                   name:
+     *                     type: string
+     *                   company:
+     *                     type: string
+     *                   purpose:
+     *                     type: string
+     *                   phoneNo:
+     *                     type: string
+     *                   date:
+     *                     type: string
+     *                     format: date
+     *                   time:
+     *                     type: string
+     *                   verification:
+     *                     type: boolean
+     *                   staff:
+     *                     type: object
+     *                     properties:
+     *                       username:
+     *                         type: string
+     *       '403':
+     *         description: Forbidden - Invalid or unauthorized token
+     *         content:
+     *           text/plain:
+     *             schema:
+     *               type: string
+     *               example: Invalid or unauthorized token
+     *       '500':
+     *         description: Internal Server Error - Error retrieving appointments
+     *         content:
+     *           text/plain:
+     *             schema:
+     *               type: string
+     *               example: Error retrieving appointments
+     */
+    app.get('/appointments', authenticateTokenForSecurity, async (req, res) => {
       const { name } = req.query;
       const { role } = req.user;
     
