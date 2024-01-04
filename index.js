@@ -200,7 +200,8 @@ app.post('/register-staff', authenticateTokenForSecurity, async (req, res) => {
  *   post:
  *     summary: Login for Staff
  *     description: Login with username and password
- *    tags:[staff]
+ *     tags:
+ *       - staff
  *     requestBody:
  *       required: true
  *       content:
@@ -216,13 +217,42 @@ app.post('/register-staff', authenticateTokenForSecurity, async (req, res) => {
  *       '200':
  *         description: Login successful
  *         content:
- *           text/plain:
+ *           application/json:
  *             schema:
- *               type: string
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
  *       '400':
  *         description: Invalid request body
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Invalid request body
  *       '401':
  *         description: Unauthorized - Invalid credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Invalid credentials
+ *       '500':
+ *         description: Internal Server Error - Error storing token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Error storing token
  */
 app.post('/login-staff', async (req, res) => {
   const { username, password } = req.body;
@@ -483,10 +513,11 @@ app.post('/register-security', async (req, res) => {
  *   get:
  *     summary: Get Staff Appointments
  *     description: Retrieve appointments for a specific staff member
- *     tags: [staff]
+ *     tags:
+ *       - staff
  *     security:
- *      - BearerAuth:[]
- *      parameters:
+ *       - BearerAuth: []
+ *     parameters:
  *       - in: path
  *         name: username
  *         description: Username of the staff member
@@ -529,12 +560,14 @@ app.post('/register-security', async (req, res) => {
  *           text/plain:
  *             schema:
  *               type: string
+ *               example: Invalid or unauthorized token
  *       '500':
  *         description: Internal Server Error - Error retrieving appointments
  *         content:
  *           text/plain:
  *             schema:
  *               type: string
+ *               example: Error retrieving appointments
  */
 
     app.get('/staff-appointments/:username', authenticateToken, async (req, res) => {
