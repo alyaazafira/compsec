@@ -605,7 +605,8 @@ app.post('/register-security', async (req, res) => {
  *   put:
  *     summary: Update Appointment Verification
  *     description: Update the verification status of an appointment by name
- *     tags:[staff]
+ *     tags: 
+ *        - staff
  *     security:
  *       - BearerAuth: []
  *     parameters:
