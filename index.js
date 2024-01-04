@@ -193,13 +193,13 @@ app.post('/register-staff', authenticateTokenForSecurity, async (req, res) => {
     const newStaff = {
       username,
       password: hashedPassword,
-      token: jwt.sign({ username, role: 'staff' }, secretKey),
+      //token: jwt.sign({ username, role: 'staff' }, secretKey),
     };
 
     // Update the staff member with the token
     await staffDB.insertOne(newStaff);
 
-    res.status(201).json({ token: newStaff.token, message: 'Successfully registered a new staff member' });
+    res.status(201).send('Successfully registered a new staff member');
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
