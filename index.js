@@ -7,7 +7,7 @@ const swaggerJsdoc = require('swagger-jsdoc');
 
 const app = express();
 const port = process.env.PORT || 3000;
-const secretKey = 'office visitor appointment';
+const secretKey = 'officevisitor';
 
 // MongoDB connection URL
 const mongoURL =
