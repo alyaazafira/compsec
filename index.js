@@ -67,7 +67,7 @@ const authenticateTokenForSecurity = (req, res, next) => {
  *components:
  *securitySchemes:
  *  bearerAuth:
- *    typeAuth:
+ *    type:http
  *    scheme: bearer
  *    bearerFormat:JWT
  */
@@ -75,43 +75,45 @@ const authenticateTokenForSecurity = (req, res, next) => {
  /**
  * @swagger
  * tags:
- *   name: Security
+ *   name: security
  *   description: APIs for security personnel
  */
 
 /**
  * @swagger
  * tags:
- *   name: Staff
+ *   name: staff
  *   description: APIs for staff 
  */
+
+// Register Staff
 /**
- @swagger
+ * @swagger
  * /register-staff:
  *   post:
  *     summary: Register a new staff (Security Authorization Required).
- *     tags:[Security]
- *    security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: body
- *         name: body
- *         description: Staff registration details.
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             username:
- *               type: string
- *               description: The username for the new staff member.
- *             password:
- *               type: string
- *               description: The password for the new staff member.
- *           required:
- *             - username
- *             - password
+ *     tags:
+ *       - security
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: The username for the new staff member.
+ *               password:
+ *                 type: string
+ *                 description: The password for the new staff member.
+ *             required:
+ *               - username
+ *               - password
  *     responses:
- *       201:
+ *       '201':
  *         description: Successfully registered a new staff member.
  *         content:
  *           application/json:
@@ -120,7 +122,7 @@ const authenticateTokenForSecurity = (req, res, next) => {
  *               properties:
  *                 token:
  *                   type: string
- *       400:
+ *       '400':
  *         description: Bad request, username already exists.
  *         content:
  *           application/json:
@@ -129,7 +131,7 @@ const authenticateTokenForSecurity = (req, res, next) => {
  *               properties:
  *                 error:
  *                   type: string
- *       401:
+ *       '401':
  *         description: Unauthorized, invalid security token.
  *         content:
  *           application/json:
@@ -139,7 +141,7 @@ const authenticateTokenForSecurity = (req, res, next) => {
  *                 error:
  *                   type: string
  *                   example: Invalid security token
- *       403:
+ *       '403':
  *         description: Forbidden, only security can register new staff.
  *         content:
  *           application/json:
@@ -149,7 +151,7 @@ const authenticateTokenForSecurity = (req, res, next) => {
  *                 error:
  *                   type: string
  *                   example: Permission denied
- *       500:
+ *       '500':
  *         description: Internal Server Error.
  *         content:
  *           application/json:
@@ -174,26 +176,21 @@ app.post('/register-staff', authenticateTokenForSecurity, async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create a new staff member
-    const newStaff = await staffDB.insertOne({
+    const newStaff = {
       username,
       password: hashedPassword,
-    });
-
-    // Generate JWT token
-    const token = jwt.sign({ username, role: 'staff' }, secretKey);
+      token: jwt.sign({ username, role: 'staff' }, secretKey),
+    };
 
     // Update the staff member with the token
-   // await staffDB.updateOne({ username }, { $set: { token } });
-    staffDB.insertOne(staff).then(() => {
-    res.status(201).json('Successfully registered a new staff member');
-    })
-    //res.status(201).json({ token });
+    await staffDB.insertOne(newStaff);
+
+    res.status(201).json({ token: newStaff.token, message: 'Successfully registered a new staff member' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
 
     // Staff login
 
