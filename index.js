@@ -102,7 +102,7 @@ const authenticateTokenForSecurity = (req, res, next) => {
  *     tags:
  *       - security
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []  # Use the correct security scheme name
  *     requestBody:
  *       required: true
  *       content:
@@ -196,10 +196,13 @@ app.post('/register-staff', authenticateTokenForSecurity, async (req, res) => {
     };
 
     // Update the staff member with the token
-    await staffDB.insertOne(newStaff);
+    const result = await staffDB.insertOne(newStaff);
 
-    // You may generate a token for the new staff if needed
-    // const token = jwt.sign({ username, role: 'staff' }, secretKey);
+    // Use the correct security scheme name in the token generation
+    const token = jwt.sign({ username, role: 'staff' }, secretKey);
+
+    // Update the staff member with the token
+    await staffDB.updateOne({ _id: result.insertedId }, { $set: { token } });
 
     res.status(201).json({ message: 'Successfully registered a new staff member' });
   } catch (error) {
@@ -207,7 +210,6 @@ app.post('/register-staff', authenticateTokenForSecurity, async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
 
     // Staff login
 /**
