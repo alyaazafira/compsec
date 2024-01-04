@@ -200,7 +200,7 @@ app.post('/register-staff', authenticateTokenForSecurity, async (req, res) => {
  *   post:
  *     summary: Login for Staff
  *     description: Login with username and password
- *     tags:[staff]
+ *    tags:[staff]
  *     requestBody:
  *       required: true
  *       content:
