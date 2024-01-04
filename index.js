@@ -86,6 +86,13 @@ const authenticateTokenForSecurity = (req, res, next) => {
  *   description: APIs for staff 
  */
 
+/**
+ * @swagger
+ * tags:
+ *   name: visitor 
+ *   description: APIs for visitor 
+ */
+
 // Register Staff
 /**
  * @swagger
@@ -436,6 +443,7 @@ app.post('/register-security', async (req, res) => {
  *   post:
  *     summary: Create Appointment
  *     description: Create a new appointment
+ *     tags: [visitor]
  *     requestBody:
  *       required: true
  *       content:
@@ -731,14 +739,15 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  * /appointments:
  *   get:
  *     summary: Get Appointments (for security)
- *     description: Retrieve appointments based on optional name filter, accessible only by security personnel
- *    tags : [security]
- *    security:
- *      -bearerAuth:[]
- *   parameters:
+ *     description: Retrieve appointments based on an optional name filter, accessible only by security personnel
+ *     tags:
+ *       - security
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
  *       - in: query
  *         name: name
- *         description: to filter appointments by name (case-insensitive)
+ *         description: Filter appointments by name (case-insensitive)
  *         schema:
  *           type: string
  *     responses:
@@ -777,14 +786,15 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  *           text/plain:
  *             schema:
  *               type: string
+ *               example: Invalid or unauthorized token
  *       '500':
  *         description: Internal Server Error - Error retrieving appointments
  *         content:
  *           text/plain:
  *             schema:
  *               type: string
+ *               example: Error retrieving appointments
  */
-
 
     app.get('/appointments', authenticateToken, async (req, res) => {
       const { name } = req.query;
