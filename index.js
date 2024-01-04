@@ -255,7 +255,7 @@ app.post('/login-staff', async (req, res) => {
  * /register-security:
  *   post:
  *     summary: Register a new security member
- *      tags:[security]
+ *     tags: [security]
  *     requestBody:
  *       required: true
  *       content:
@@ -485,7 +485,7 @@ app.post('/register-security', async (req, res) => {
  *     description: Retrieve appointments for a specific staff member
  *     tags: [staff]
  *     security:
- *      - bearerAuth:[]
+ *      - BearerAuth:[]
  *      parameters:
  *       - in: path
  *         name: username
