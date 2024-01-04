@@ -63,14 +63,14 @@ const authenticateTokenForSecurity = (req, res, next) => {
 };
 
 /**
- *@Swagger
- *components:
- *securitySchemes:
- *  BearerAuth:
- *    type:http
- *    scheme: bearer
- *    bearerFormat:JWT
- */
+* @swagger
+* components:
+*   securitySchemes:
+*     BearerAuth:
+*       type: http
+*       scheme: bearer
+*       bearerFormat: JWT
+*/
 
  /**
  * @swagger
