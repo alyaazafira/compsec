@@ -1,12 +1,12 @@
 const express = require('express');
 const mongodb = require('mongodb');
+const { MongoClient, ServerApiVersion } = require('mongodb');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
-const { MongoClient, ServerApiVersion } = require('mongodb');
-
 const app = express();
+
 const port = process.env.PORT || 3000;
 const secretKey = 'officevisitor';
 const credentials = 'C:/Users/User/Desktop/vms_compsec/compsec/X509-cert-2369718151529005450.pem'
@@ -18,6 +18,8 @@ const credentials = 'C:/Users/User/Desktop/vms_compsec/compsec/X509-cert-2369718
   tlsCertificateKeyFile: credentials,
   serverApi: ServerApiVersion.v1
 });
+
+  
 // MongoDB database and collections names
 const dbName = 'companyappointment';
 const staffCollection = 'staff';
