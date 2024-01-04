@@ -171,6 +171,12 @@ const authenticateTokenForSecurity = (req, res, next) => {
  */
 app.post('/register-staff', authenticateTokenForSecurity, async (req, res) => {
   try {
+    const { role } = req.user;
+  
+    if (role !== 'security') {
+      return res.status(403).json({ error: 'Permission denied' });
+    }
+
     const { username, password } = req.body;
 
     // Check if the username already exists
