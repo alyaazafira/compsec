@@ -127,7 +127,7 @@ const authenticateTokenForSecurity = (req, res, next) => {
  *             schema:
  *               type: object
  *               properties:
- *                 token:
+ *                 message:
  *                   type: string
  *       '400':
  *         description: Bad request, username already exists.
@@ -178,14 +178,14 @@ app.post('/register-staff', authenticateTokenForSecurity, async (req, res) => {
 
   const { username, password } = req.body;
 
-  // Check if the username already exists
-  const existingStaff = await staffDB.findOne({ username });
-
-  if (existingStaff) {
-    return res.status(400).json({ error: 'Username already exists' });
-  }
-
   try {
+    // Check if the username already exists
+    const existingStaff = await staffDB.findOne({ username });
+
+    if (existingStaff) {
+      return res.status(400).json({ error: 'Username already exists' });
+    }
+
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -193,13 +193,15 @@ app.post('/register-staff', authenticateTokenForSecurity, async (req, res) => {
     const newStaff = {
       username,
       password: hashedPassword,
-      //token: jwt.sign({ username, role: 'staff' }, secretKey),
     };
 
     // Update the staff member with the token
     await staffDB.insertOne(newStaff);
 
-    res.status(201).send('Successfully registered a new staff member');
+    // You may generate a token for the new staff if needed
+    // const token = jwt.sign({ username, role: 'staff' }, secretKey);
+
+    res.status(201).json({ message: 'Successfully registered a new staff member' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
