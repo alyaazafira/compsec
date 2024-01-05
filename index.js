@@ -50,14 +50,13 @@ const authenticateToken = (req, res, next) => {
   const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
-    return res.status(401).json({ error: 'Missing token' });
+    return res.status(401).send('Invalid or unauthorized token');
   }
 
   jwt.verify(token, secretKey, (err, user) => {
     if (err) {
-      return res.status(403).json({ error: 'Invalid or expired token' });
+      return res.status(403).send('Invalid or expired token');
     }
-
     req.user = user;
     next();
   });
@@ -103,7 +102,7 @@ const authenticateToken = (req, res, next) => {
  *     tags:
  *       - staff
  *     security:
- *       - BearerAuth: []  # Use the correct security scheme name
+ *       - BearerAuth: []  
  *     requestBody:
  *       required: true
  *       content:
@@ -117,9 +116,6 @@ const authenticateToken = (req, res, next) => {
  *               password:
  *                 type: string
  *                 description: The password for the new staff member.
- *             required:
- *               - username
- *               - password
  *     responses:
  *       '201':
  *         description: Successfully registered a new staff member.
@@ -177,9 +173,7 @@ app.post('/register-staff', authenticateToken, async (req, res) => {
   if (role !== 'security') {
     return res.status(403).json({ error: 'Permission denied' });
   }
-
   const { username, password } = req.body;
-
   try {
     // Check if the username already exists
     const existingStaff = await staffDB.findOne({ username });
@@ -203,9 +197,7 @@ app.post('/register-staff', authenticateToken, async (req, res) => {
     // Use the correct security scheme name in the token generation
     const token = jwt.sign({ username, role: 'staff' }, secretKey);
 
-    // Update the staff member with the token
-    await staffDB.updateOne({ _id: result.insertedId }, { $set: { token } });
-
+    staffDBDB.push(newStaff);
     res.status(201).json({ message: 'Successfully registered a new staff member' });
   } catch (error) {
     console.error(error);
@@ -355,7 +347,7 @@ app.post('/register-security', async (req, res) => {
 
     securityDB.push(newSecurity);
 
-    res.status(201).json({ token });
+    res.status(201).json({ message: 'Successfully registered a new security' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
