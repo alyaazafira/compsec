@@ -11,7 +11,7 @@ const secretKey = 'officevisitor';
 
 // MongoDB connection URL
 const mongoURL =
-  'mongodb+srv://alyaazafira:alyaazafira@alyaa.emy970i.mongodb.net/?retryWrites=true&w=majority';
+  'mongodb+srv://alyaazafira:4pp0intmentv1s170r@alyaa.emy970i.mongodb.net/?retryWrites=true&w=majority';
 
 // MongoDB database and collections names
 const dbName = 'companyappointment';
