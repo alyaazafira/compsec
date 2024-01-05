@@ -358,7 +358,7 @@ app.post('/register-security', async (req, res) => {
       // Update the security member with the token
       await securityDB.updateOne({ username }, { $set: { token } });
   
-      res.status(201).json({ token });
+      res.status(201).json({ message: 'Successfully registered a new staff member' });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -447,8 +447,6 @@ const authenticateToken = (req, res, next) => {
     next();
   });
 };
-    
-
     // Create appointment
 
 /**
