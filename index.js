@@ -447,6 +447,88 @@ const authenticateToken = (req, res, next) => {
     next();
   });
 };
+
+/**
+ * @swagger
+ * /change-password:
+ *   post:
+ *     summary: Change Password
+ *     description: Change user password by verifying the old password
+ *     tags:
+ *       - authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               oldPassword:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Password changed successfully
+ *       '400':
+ *         description: Invalid request body or old password mismatch
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Invalid request body or old password mismatch
+ *       '401':
+ *         description: Unauthorized - Invalid credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Invalid credentials
+ *       '500':
+ *         description: Internal Server Error - Error updating password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Error updating password
+ */
+app.post('/change-password', async (req, res) => {
+  const { username, oldPassword, newPassword } = req.body;
+
+  const user = await staffDB.findOne({ username });
+
+  if (!user) {
+    return res.status(401).send('Invalid credentials');
+  }
+
+  const passwordMatch = await bcrypt.compare(oldPassword, user.password);
+
+  if (!passwordMatch) {
+    return res.status(400).send('Invalid request body or old password mismatch');
+  }
+
+  const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+  staffDB
+    .updateOne({ username }, { $set: { password: hashedNewPassword } })
+    .then(() => {
+      res.status(200).send('Password changed successfully');
+    })
+    .catch(() => {
+      res.status(500).send('Error updating password');
+    });
+});
     // Create appointment
 
 /**
