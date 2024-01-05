@@ -14,10 +14,7 @@ const secretKey = 'officevisitor';
 // MongoDB connection URL
 const mongoURL =
  'mongodb+srv://alyaazafira:alyaazafira@alyaa.emy970i.mongodb.net/?retryWrites=true&w=majority';
- /*const client = new MongoClient('mongodb+srv://alyaa.emy970i.mongodb.net/?authSource=%24external&authMechanism=MONGODB-X509&retryWrites=true&w=majority', {
-  tlsCertificateKeyFile: credentials,
-  serverApi: ServerApiVersion.v1
-});*/
+
 
   
 // MongoDB database and collections names
