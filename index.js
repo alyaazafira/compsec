@@ -366,7 +366,7 @@ app.post('/register-security', async (req, res) => {
   });
   
 
-    // Security login
+// Security login
 /**
  * @swagger
  * /login-security:
@@ -401,49 +401,52 @@ app.post('/register-security', async (req, res) => {
  *         description: Internal Server Error - Error storing token
  */
 
-    app.post('/login-security', async (req, res) => {
-      const { username, password } = req.body;
+app.post('/login-security', async (req, res) => {
+  const { username, password } = req.body;
 
-      const security = await securityDB.findOne({ username });
+  const security = await securityDB.findOne({ username });
 
-      if (!security) {
-        return res.status(401).send('Invalid credentials');
-      }
+  if (!security) {
+    return res.status(401).send('Invalid credentials');
+  }
 
-      const passwordMatch = await bcrypt.compare(password, security.password);
+  const passwordMatch = await bcrypt.compare(password, security.password);
 
-      if (!passwordMatch) {
-        return res.status(401).send('Invalid credentials');
-      }
+  if (!passwordMatch) {
+    return res.status(401).send('Invalid credentials');
+  }
 
-      const token = security.token || jwt.sign({ username, role: 'security' }, secretKey);
-      securityDB
-        .updateOne({ username }, { $set: { token } })
-        .then(() => {
-          res.status(200).json({ token });
-        })
-        .catch(() => {
-          res.status(500).send('Error storing token');
-        });
+  // Generate a new token for the user
+  const newToken = jwt.sign({ username, role: 'security' }, secretKey);
+
+  // Update the user's token in the database
+  securityDB
+    .updateOne({ username }, { $set: { token: newToken } })
+    .then(() => {
+      res.status(200).json({ token: newToken });
+    })
+    .catch(() => {
+      res.status(500).send('Error storing token');
     });
+});
 
-    // Middleware for authentication and authorization
-    const authenticateToken = (req, res, next) => {
-      const authHeader = req.headers['authorization'];
-      const token = authHeader && authHeader.split(' ')[1];
-    
-      if (!token) {
-        return res.status(401).send('Missing token');
-      }
-    
-      jwt.verify(token, secretKey, (err, user) => {
-        if (err) {
-          return res.status(403).send('Invalid or expired token');
-        }
-        req.user = user;
-        next();
-      });
-    };
+// Middleware for authentication and authorization
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).send('Missing token');
+  }
+
+  jwt.verify(token, secretKey, (err, user) => {
+    if (err) {
+      return res.status(403).send('Invalid or expired token');
+    }
+    req.user = user;
+    next();
+  });
+};
     
 
     // Create appointment
