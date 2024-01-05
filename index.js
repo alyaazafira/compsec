@@ -465,6 +465,9 @@ const authenticateToken = (req, res, next) => {
  *             properties:
  *               username:
  *                 type: string
+ *               role:
+ *                 type: string
+ *                 enum: [security, staff]
  *               oldPassword:
  *                 type: string
  *               newPassword:
@@ -504,9 +507,16 @@ const authenticateToken = (req, res, next) => {
  *                   example: Error updating password
  */
 app.post('/change-password', async (req, res) => {
-  const { username, oldPassword, newPassword } = req.body;
+  const { username, role, oldPassword, newPassword } = req.body;
 
-  const user = await staffDB.findOne({ username });
+  let user;
+  if (role === 'security') {
+    user = await securityDB.findOne({ username });
+  } else if (role === 'staff') {
+    user = await staffDB.findOne({ username });
+  } else {
+    return res.status(400).send('Invalid role');
+  }
 
   if (!user) {
     return res.status(401).send('Invalid credentials');
@@ -520,15 +530,27 @@ app.post('/change-password', async (req, res) => {
 
   const hashedNewPassword = await bcrypt.hash(newPassword, 10);
 
-  staffDB
-    .updateOne({ username }, { $set: { password: hashedNewPassword } })
-    .then(() => {
-      res.status(200).send('Password changed successfully');
-    })
-    .catch(() => {
-      res.status(500).send('Error updating password');
-    });
+  if (role === 'security') {
+    securityDB
+      .updateOne({ username }, { $set: { password: hashedNewPassword } })
+      .then(() => {
+        res.status(200).send('Password changed successfully');
+      })
+      .catch(() => {
+        res.status(500).send('Error updating password');
+      });
+  } else if (role === 'staff') {
+    staffDB
+      .updateOne({ username }, { $set: { password: hashedNewPassword } })
+      .then(() => {
+        res.status(200).send('Password changed successfully');
+      })
+      .catch(() => {
+        res.status(500).send('Error updating password');
+      });
+  }
 });
+
     // Create appointment
 
 /**
