@@ -199,11 +199,8 @@ const authenticateTokenForSecurity = (req, res, next) => {
         // Update the staff member with the token
         const result = await staffDB.insertOne(newStaff);
 
-        // Use the correct security scheme name in the token generation
-        const token = jwt.sign({ username, role: 'staff' }, `${secretKey}-${Date.now()}`);
-
         // Update the staff member with the token
-        await staffDB.updateOne({ _id: result.insertedId }, { $set: { token } });
+        //await staffDB.updateOne({ _id: result.insertedId }, { $set: { token } });
 
         res.status(201).json({ message: 'Successfully registered a new staff member' });
       } catch (error) {
@@ -288,7 +285,9 @@ app.post('/login-staff', async (req, res) => {
     return res.status(401).send('Invalid credentials');
   }
 
-  const token = jwt.sign({ username, role: 'staff' }, secretKey);
+  // Use the correct security scheme name in the token generation
+  const token = jwt.sign({ username, role: 'staff' }, `${secretKey}-${Date.now()}`);
+
   staffDB
     .updateOne({ username }, { $set: { token } })
     .then(() => {
@@ -354,12 +353,12 @@ app.post('/register-security', async (req, res) => {
       });
   
       // Generate JWT token
-      const token = jwt.sign({ username, role: 'security' }, secretKey);
+   //   const token = jwt.sign({ username, role: 'security' }, secretKey);
   
       // Update the security member with the token
-      await securityDB.updateOne({ username }, { $set: { token } });
+     // await securityDB.updateOne({ username }, { $set: { token } });
   
-      res.status(201).json({ token });
+     res.status(201).json({ message: 'Successfully registered a new staff member' });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -417,7 +416,10 @@ app.post('/register-security', async (req, res) => {
         return res.status(401).send('Invalid credentials');
       }
 
-      const token = security.token || jwt.sign({ username, role: 'security' }, secretKey);
+     
+  // Use the correct security scheme name in the token generation
+  const token = jwt.sign({ username, role: 'security' }, `${secretKey}-${Date.now()}`);
+
       securityDB
         .updateOne({ username }, { $set: { token } })
         .then(() => {
