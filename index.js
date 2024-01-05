@@ -94,123 +94,122 @@ const authenticateTokenForSecurity = (req, res, next) => {
  */
 
 // Register Staff
-   // Register Staff
-    /**
-     * @swagger
-     * /register-staff:
-     *   post:
-     *     summary: Register a new staff (Security Authorization Required).
-     *     tags:
-     *       - security
-     *     security:
-     *       - BearerAuth: []  # Use the correct security scheme name
-     *     requestBody:
-     *       required: true
-     *       content:
-     *         application/json:
-     *           schema:
-     *             type: object
-     *             properties:
-     *               username:
-     *                 type: string
-     *                 description: The username for the new staff member.
-     *               password:
-     *                 type: string
-     *                 description: The password for the new staff member.
-     *             required:
-     *               - username
-     *               - password
-     *     responses:
-     *       '201':
-     *         description: Successfully registered a new staff member.
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: object
-     *               properties:
-     *                 message:
-     *                   type: string
-     *       '400':
-     *         description: Bad request, username already exists.
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: object
-     *               properties:
-     *                 error:
-     *                   type: string
-     *       '401':
-     *         description: Unauthorized, invalid security token.
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: object
-     *               properties:
-     *                 error:
-     *                   type: string
-     *                   example: Invalid security token
-     *       '403':
-     *         description: Forbidden, only security can register new staff.
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: object
-     *               properties:
-     *                 error:
-     *                   type: string
-     *                   example: Permission denied
-     *       '500':
-     *         description: Internal Server Error.
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: object
-     *               properties:
-     *                 error:
-     *                   type: string
-     *                   example: Internal Server Error
-     */
-    app.post('/register-staff', authenticateTokenForSecurity, async (req, res) => {
-      const { role } = req.user;
+/**
+ * @swagger
+ * /register-staff:
+ *   post:
+ *     summary: Register a new staff (Security Authorization Required).
+ *     tags:
+ *       - security
+ *     security:
+ *       - BearerAuth: []  # Use the correct security scheme name
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: The username for the new staff member.
+ *               password:
+ *                 type: string
+ *                 description: The password for the new staff member.
+ *             required:
+ *               - username
+ *               - password
+ *     responses:
+ *       '201':
+ *         description: Successfully registered a new staff member.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       '400':
+ *         description: Bad request, username already exists.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *       '401':
+ *         description: Unauthorized, invalid security token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Invalid security token
+ *       '403':
+ *         description: Forbidden, only security can register new staff.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Permission denied
+ *       '500':
+ *         description: Internal Server Error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Internal Server Error
+ */
+app.post('/register-staff', authenticateTokenForSecurity, async (req, res) => {
+  const { role } = req.user;
 
-      if (role !== 'security') {
-        return res.status(403).json({ error: 'Permission denied' });
-      }
+  if (role !== 'security') {
+    return res.status(403).json({ error: 'Permission denied' });
+  }
 
-      const { username, password } = req.body;
+  const { username, password } = req.body;
 
-      try {
-        // Check if the username already exists
-        const existingStaff = await staffDB.findOne({ username });
+  try {
+    // Check if the username already exists
+    const existingStaff = await staffDB.findOne({ username });
 
-        if (existingStaff) {
-          return res.status(400).json({ error: 'Username already exists' });
-        }
+    if (existingStaff) {
+      return res.status(400).json({ error: 'Username already exists' });
+    }
 
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(password, 10);
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create a new staff member
-        const newStaff = {
-          username,
-          password: hashedPassword,
-        };
+    // Create a new staff member
+    const newStaff = {
+      username,
+      password: hashedPassword,
+    };
 
-        // Update the staff member with the token
-        const result = await staffDB.insertOne(newStaff);
+    // Update the staff member with the token
+    const result = await staffDB.insertOne(newStaff);
 
-        // Use the correct security scheme name in the token generation
-        const token = jwt.sign({ username, role: 'staff' }, `${secretKey}-${Date.now()}`);
+    // Use the correct security scheme name in the token generation
+    const token = jwt.sign({ username, role: 'staff' }, `${secretKey}-${Date.now()}`);
 
-        // Update the staff member with the token
-        await staffDB.updateOne({ _id: result.insertedId }, { $set: { token } });
+    // Update the staff member with the token
+    await staffDB.updateOne({ _id: result.insertedId }, { $set: { token } });
 
-        res.status(201).json({ message: 'Successfully registered a new staff member' });
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
-      }
-    });
+    res.status(201).json({ message: 'Successfully registered a new staff member' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
     // Staff login
 /**
@@ -746,88 +745,87 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
     });
 
  // Get all appointments (for security)
-    /**
-     * @swagger
-     * /appointments:
-     *   get:
-     *     summary: Get Appointments (for security)
-     *     description: Retrieve appointments based on an optional name filter, accessible only by security personnel
-     *     tags:
-     *       - security
-     *     security:
-     *       - BearerAuth: []
-     *     parameters:
-     *       - in: query
-     *         name: name
-     *         description: Filter appointments by name (case-insensitive)
-     *         schema:
-     *           type: string
-     *     responses:
-     *       '200':
-     *         description: Appointments retrieved successfully
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: array
-     *               items:
-     *                 type: object
-     *                 properties:
-     *                   name:
-     *                     type: string
-     *                   company:
-     *                     type: string
-     *                   purpose:
-     *                     type: string
-     *                   phoneNo:
-     *                     type: string
-     *                   date:
-     *                     type: string
-     *                     format: date
-     *                   time:
-     *                     type: string
-     *                   verification:
-     *                     type: boolean
-     *                   staff:
-     *                     type: object
-     *                     properties:
-     *                       username:
-     *                         type: string
-     *       '403':
-     *         description: Forbidden - Invalid or unauthorized token
-     *         content:
-     *           text/plain:
-     *             schema:
-     *               type: string
-     *               example: Invalid or unauthorized token
-     *       '500':
-     *         description: Internal Server Error - Error retrieving appointments
-     *         content:
-     *           text/plain:
-     *             schema:
-     *               type: string
-     *               example: Error retrieving appointments
-     */
-    app.get('/appointments', authenticateTokenForSecurity, async (req, res) => {
-      const { name } = req.query;
-      const { role } = req.user;
-    
-      if (role !== 'security') {
-        return res.status(403).send('Invalid or unauthorized token');
-      }
-    
-      const filter = name ? { name: { $regex: name, $options: 'i' } } : {};
-    
-      appointmentDB
-        .find(filter)
-        .toArray()
-        .then((appointments) => {
-          res.json(appointments);
-        })
-        .catch((error) => {
-          res.status(500).send('Error retrieving appointments');
-        });
-    });
+/**
+ * @swagger
+ * /appointments:
+ *   get:
+ *     summary: Get Appointments (for security)
+ *     description: Retrieve appointments based on an optional name filter, accessible only by security personnel
+ *     tags:
+ *       - security
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: name
+ *         description: Filter appointments by name (case-insensitive)
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Appointments retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   name:
+ *                     type: string
+ *                   company:
+ *                     type: string
+ *                   purpose:
+ *                     type: string
+ *                   phoneNo:
+ *                     type: string
+ *                   date:
+ *                     type: string
+ *                     format: date
+ *                   time:
+ *                     type: string
+ *                   verification:
+ *                     type: boolean
+ *                   staff:
+ *                     type: object
+ *                     properties:
+ *                       username:
+ *                         type: string
+ *       '403':
+ *         description: Forbidden - Invalid or unauthorized token
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Invalid or unauthorized token
+ *       '500':
+ *         description: Internal Server Error - Error retrieving appointments
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Error retrieving appointments
+ */
+app.get('/appointments', authenticateTokenForSecurity, async (req, res) => {
+  const { name } = req.query;
+  const { role } = req.user;
 
+  if (role !== 'security') {
+    return res.status(403).send('Invalid or unauthorized token');
+  }
+
+  const filter = name ? { name: { $regex: name, $options: 'i' } } : {};
+
+  appointmentDB
+    .find(filter)
+    .toArray()
+    .then((appointments) => {
+      res.json(appointments);
+    })
+    .catch((error) => {
+      res.status(500).send('Error retrieving appointments');
+    });
+});
 
 // Logout
 
