@@ -93,8 +93,7 @@ const authenticateTokenForSecurity = (req, res, next) => {
  *   description: APIs for visitor 
  */
 
-// Register Staff
-// Register Staff
+   // Register Staff
    // Register Staff
     /**
      * @swagger
@@ -212,7 +211,6 @@ const authenticateTokenForSecurity = (req, res, next) => {
         res.status(500).json({ error: 'Internal Server Error' });
       }
     });
-
     // Staff login
 /**
  * @swagger
