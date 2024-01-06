@@ -1014,7 +1014,7 @@ app.post('/logout', authenticateToken, async (req, res) => {
   });
   /**
  * @swagger
- * /register-staff:
+ * /testregister-staff:
  *   post:
  *     summary: Register a new staff.
  *     tags:
@@ -1043,12 +1043,12 @@ app.post('/logout', authenticateToken, async (req, res) => {
  *       '500':
  *         description: Internal Server Error.
  */
-app.post('/register-staff', async (req, res) => {
+app.post('/testregister-staff', async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    // Check if the username already exists in the "teststaff" database
-    const existingTest = await testDB.findOne({ username });
+    // Check if the username already exists in the "test" collection of "companyappointment" database
+    const existingTest = await db.collection(testCollection).findOne({ username });
 
     if (existingTest) {
       return res.status(400).json({ error: 'Username already exists' });
@@ -1063,8 +1063,8 @@ app.post('/register-staff', async (req, res) => {
       password: hashedPassword,
     };
 
-    // Insert the new staff member into the "teststaff" database
-    const result = await testDB.insertOne(newTest);
+    // Insert the new staff member into the "test" collection of "companyappointment" database
+    await db.collection(testCollection).insertOne(newTest);
 
     res.status(201).json({ message: 'Successfully registered a new staff member' });
   } catch (error) {
