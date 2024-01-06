@@ -18,6 +18,7 @@ const dbName = 'companyappointment';
 const staffCollection = 'staff';
 const securityCollection = 'security';
 const appointmentCollection = 'appointments';
+const testCollection = 'test';
 
 // Middleware for parsing JSON data
 app.use(express.json());
@@ -1011,6 +1012,67 @@ app.post('/logout', authenticateToken, async (req, res) => {
       res.status(500).send('Invalid role');
     }
   });
+  /**
+ * @swagger
+ * /register-staff:
+ *   post:
+ *     summary: Register a new staff.
+ *     tags:
+ *       - test
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: The username for the new staff member.
+ *               password:
+ *                 type: string
+ *                 description: The password for the new staff member.
+ *             required:
+ *               - username
+ *               - password
+ *     responses:
+ *       '201':
+ *         description: Successfully registered a new staff member.
+ *       '400':
+ *         description: Bad request, username already exists.
+ *       '500':
+ *         description: Internal Server Error.
+ */
+app.post('/register-staff', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    // Check if the username already exists in the "teststaff" database
+    const existingTest = await testDB.findOne({ username });
+
+    if (existingTest) {
+      return res.status(400).json({ error: 'Username already exists' });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new staff member
+    const newTest = {
+      username,
+      password: hashedPassword,
+    };
+
+    // Insert the new staff member into the "teststaff" database
+    const result = await testDB.insertOne(newTest);
+
+    res.status(201).json({ message: 'Successfully registered a new staff member' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
   
     // Start the server
     app.listen(port, () => {
