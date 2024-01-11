@@ -602,11 +602,8 @@ app.post('/change-password', async (req, res) => {
  *                 type: string
  *               verification:
  *                 type: boolean
- *               staff:
- *                 type: object
- *                 properties:
- *                   username:
- *                     type: string
+ *               staffId:
+ *                 type: string
  *     responses:
  *       '200':
  *         description: Appointment created successfully
@@ -614,42 +611,61 @@ app.post('/change-password', async (req, res) => {
  *           text/plain:
  *             schema:
  *               type: string
+ *       '400':
+ *         description: Bad request - Invalid staffId or staff not found
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Invalid staffId. Staff not found.
  *       '500':
  *         description: Internal Server Error - Error creating appointment
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Error creating appointment
  */
 
-    app.post('/appointments', async (req, res) => {
-      const {
-        name,
-        company,
-        purpose,
-        phoneNo,
-        date,
-        time,
-        verification,
-        staff: { username },
-      } = req.body;
+app.post('/appointments', async (req, res) => {
+  const {
+    name,
+    company,
+    purpose,
+    phoneNo,
+    date,
+    time,
+    verification,
+    staffId,
+  } = req.body;
 
-      const appointment = {
-        name,
-        company,
-        purpose,
-        phoneNo,
-        date,
-        time,
-        verification,
-        staff: { username },
-      };
+  try {
+    // Fetch the staff based on staffId
+    const staff = await staffDB.findOne({ _id: ObjectId(staffId) });
 
-      appointmentDB
-        .insertOne(appointment)
-        .then(() => {
-          res.status(200).send('Appointment created successfully');
-        })
-        .catch((error) => {
-          res.status(500).send('Error creating appointment');
-        });
-    });
+    if (!staff) {
+      return res.status(400).send('Invalid staffId. Staff not found.');
+    }
+
+    const appointment = {
+      name,
+      company,
+      purpose,
+      phoneNo,
+      date,
+      time,
+      verification,
+      staff: { staffId: staff._id },  
+    };
+
+    await appointmentDB.insertOne(appointment);
+    res.status(200).send('Appointment created successfully');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error creating appointment');
+  }
+});
+
 
     // Get staff's appointments
 /**
@@ -870,7 +886,7 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
         });
     });
 
- // Get all appointments (for security)
+// Get all appointments (for security)
 /**
  * @swagger
  * /appointments:
@@ -899,23 +915,15 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  *                 properties:
  *                   name:
  *                     type: string
- *                   company:
- *                     type: string
- *                   purpose:
- *                     type: string
- *                   phoneNo:
- *                     type: string
  *                   date:
  *                     type: string
  *                     format: date
  *                   time:
  *                     type: string
- *                   verification:
- *                     type: boolean
  *                   staff:
  *                     type: object
  *                     properties:
- *                       username:
+ *                       #Omit the username property to hide it
  *                         type: string
  *       '403':
  *         description: Forbidden - Invalid or unauthorized token
@@ -944,6 +952,7 @@ app.get('/appointments', authenticateTokenForSecurity, async (req, res) => {
 
   appointmentDB
     .find(filter)
+    .project({ name: 1, date: 1, time: 1, 'staff': 1 }) // Include only necessary fields
     .toArray()
     .then((appointments) => {
       res.json(appointments);
@@ -952,6 +961,7 @@ app.get('/appointments', authenticateTokenForSecurity, async (req, res) => {
       res.status(500).send('Error retrieving appointments');
     });
 });
+
 
 // Logout
 
