@@ -111,15 +111,31 @@ const authenticateTokenForSecurity = (req, res, next) => {
  *           schema:
  *             type: object
  *             properties:
+ *               staffId:
+ *                 type: number
+ *                 description: The unique identifier for the new staff member.
+ *               name:
+ *                 type: string
+ *                 description: The name of the new staff member.
  *               username:
  *                 type: string
  *                 description: The username for the new staff member.
  *               password:
  *                 type: string
  *                 description: The password for the new staff member.
+ *               position:
+ *                 type: string
+ *                 description: The position of the new staff member.
+ *               phoneNumber:
+ *                 type: string
+ *                 description: The phone number of the new staff member.
  *             required:
+ *               - staffId
+ *               - name
  *               - username
  *               - password
+ *               - position
+ *               - phoneNumber
  *     responses:
  *       '201':
  *         description: Successfully registered a new staff member.
@@ -177,7 +193,7 @@ app.post('/register-staff', authenticateTokenForSecurity, async (req, res) => {
     return res.status(403).json({ error: 'Permission denied' });
   }
 
-  const { username, password } = req.body;
+  const { staffId, name, username, password, position, phoneNumber } = req.body;
 
   try {
     // Check if the username already exists
@@ -192,8 +208,12 @@ app.post('/register-staff', authenticateTokenForSecurity, async (req, res) => {
 
     // Create a new staff member
     const newStaff = {
+      staffId,
+      name,
       username,
       password: hashedPassword,
+      position,
+      phoneNumber,
     };
 
     // Update the staff member with the token
