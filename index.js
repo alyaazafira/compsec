@@ -92,6 +92,13 @@ const authenticateTokenForAdmin = (req, res, next) => {
 *       scheme: bearer
 *       bearerFormat: JWT
 */
+ 
+/**
+ * @swagger
+ * tags:
+ *   name: admin
+ *   description: APIs for admin
+ */
 
  /**
  * @swagger
@@ -173,6 +180,71 @@ app.post('/register-admin', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+//login admin
+
+/**
+ * @swagger
+ * /login-admin:
+ *   post:
+ *     summary: Admin Login
+ *     description: Authenticate admin with username and password
+ *     tags: [admin]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *       '401':
+ *         description: Unauthorized - Invalid credentials
+ *       '500':
+ *         description: Internal Server Error - Error storing token
+ */
+app.post('/login-admin', async (req, res) => {
+  const { username, password } = req.body;
+
+  const admin = await db.collection('admin').findOne({ username });
+
+  if (!admin) {
+    return res.status(401).send('Invalid credentials');
+  }
+
+  const passwordMatch = await bcrypt.compare(password, admin.password);
+
+  if (!passwordMatch) {
+    return res.status(401).send('Invalid credentials');
+  }
+
+  // Generate a new token for the admin
+  const newToken = jwt.sign({ username, role: 'admin' }, secretKey);
+
+  // Update the admin's token in the database
+  db.collection('admin')
+    .updateOne({ username }, { $set: { token: newToken } })
+    .then(() => {
+      res.status(200).json({ token: newToken });
+    })
+    .catch(() => {
+      res.status(500).send('Error storing token');
+    });
+});
+
 
 // Register Staff
 /**
