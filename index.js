@@ -15,6 +15,7 @@ const mongoURL =
 
 // MongoDB database and collections names
 const dbName = 'companyappointment';
+const adminCollection = 'admin';
 const staffCollection = 'staff';
 const securityCollection = 'security';
 const appointmentCollection = 'appointments';
@@ -41,9 +42,11 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 mongodb.MongoClient.connect(mongoURL)
   .then((client) => {
     const db = client.db(dbName);
+    const adminDB = db.collection(adminCollection);
     const staffDB = db.collection(staffCollection);
     const securityDB = db.collection(securityCollection);
     const appointmentDB = db.collection(appointmentCollection);
+    const testDB = db.collection(testCollection);
 
 // Middleware for authentication and authorization (specifically for security role)
 const authenticateTokenForSecurity = (req, res, next) => {
@@ -56,6 +59,23 @@ const authenticateTokenForSecurity = (req, res, next) => {
 
   jwt.verify(token, secretKey, (err, user) => {
     if (err || user.role !== 'security') {
+      return res.status(403).json({ error: 'Invalid or unauthorized token' });
+    }
+    req.user = user;
+    next();
+  });
+};
+// Middleware for authentication and authorization (specifically for admin role)
+const authenticateTokenForAdmin = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Missing token' });
+  }
+
+  jwt.verify(token, secretKey, (err, user) => {
+    if (err || user.role !== 'admin') {
       return res.status(403).json({ error: 'Invalid or unauthorized token' });
     }
     req.user = user;
@@ -93,6 +113,66 @@ const authenticateTokenForSecurity = (req, res, next) => {
  *   name: visitor 
  *   description: APIs for visitor 
  */
+//register admin
+/**
+ * @swagger
+ * /register-admin:
+ *   post:
+ *     summary: Register a new admin
+ *     tags: [admin]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: The username for the new admin.
+ *               password:
+ *                 type: string
+ *                 description: The password for the new admin.
+ *             required:
+ *               - username
+ *               - password
+ *     responses:
+ *       '201':
+ *         description: Successfully registered a new admin.
+ *       '400':
+ *         description: Bad request, username already exists.
+ *       '500':
+ *         description: Internal Server Error.
+ */
+app.post('/register-admin', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    // Check if the username already exists for admin
+    const existingAdmin = await db.collection('admin').findOne({ username });
+
+    if (existingAdmin) {
+      return res.status(400).json({ error: 'Username already exists' });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new admin
+    const newAdmin = {
+      username,
+      password: hashedPassword,
+    };
+
+    // Insert the new admin into the "admin" collection of "companyappointment" database
+    await db.collection('admin').insertOne(newAdmin);
+
+    res.status(201).json({ message: 'Successfully registered a new admin' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 // Register Staff
 /**
