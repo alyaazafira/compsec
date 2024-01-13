@@ -1137,7 +1137,6 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  *                   staff:
  *                     type: object
  *                     properties:
- *                       #Omit the username property to hide it
  *                         type: string
  *       '403':
  *         description: Forbidden - Invalid or unauthorized token
