@@ -308,6 +308,47 @@ app.get('/admin/see-everything', authenticateTokenForAdmin, async (req, res) => 
   }
 });
 
+//admin see data
+/**
+ * @swagger
+ * /admin/data:
+ *   get:
+ *     summary: Get all data for admin
+ *     description: Retrieve all data including staff, security, and appointment information.
+ *     tags: [admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Successfully retrieved all data for admin.
+ *       '401':
+ *         description: Unauthorized - Invalid or missing token.
+ *       '403':
+ *         description: Forbidden - User does not have admin privileges.
+ *       '500':
+ *         description: Internal Server Error.
+ */
+app.get('/admin/data', authenticateTokenForAdmin, async (req, res) => {
+  try {
+    // Fetch all data from staff, security, and appointment collections
+    const staffData = await db.collection('staff').find({}).toArray();
+    const securityData = await db.collection('security').find({}).toArray();
+    const appointmentData = await db.collection('appointment').find({}).toArray();
+
+    const allData = {
+      staff: staffData,
+      security: securityData,
+      appointment: appointmentData,
+    };
+
+    res.status(200).json(allData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
 // Register Staff
 /**
  * @swagger
