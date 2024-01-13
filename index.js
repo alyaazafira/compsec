@@ -245,6 +245,68 @@ app.post('/login-admin', async (req, res) => {
     });
 });
 
+//admin can see everythings
+/**
+ * @swagger
+ * /admin/see-everything:
+ *   get:
+ *     summary: View all information (staff, security, and appointments)
+ *     tags: [admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Successfully retrieved all information.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 staff:
+ *                   type: array
+ *                   description: List of staff members.
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       // Define staff properties here
+ *                 security:
+ *                   type: array
+ *                   description: List of security details.
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       // Define security properties here
+ *                 appointments:
+ *                   type: array
+ *                   description: List of appointments.
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       // Define appointment properties here
+ *       '401':
+ *         description: Unauthorized - Invalid or missing token.
+ *       '403':
+ *         description: Forbidden - User does not have admin privileges.
+ *       '500':
+ *         description: Internal Server Error.
+ */
+app.get('/admin/see-everything', authenticateTokenForAdmin, async (req, res) => {
+  try {
+    // Retrieve all staff members
+    const staff = await db.collection('staff').find().toArray();
+
+    // Retrieve all security details
+    const security = await db.collection('security').find().toArray();
+
+    // Retrieve all appointments
+    const appointments = await db.collection('appointments').find().toArray();
+
+    res.status(200).json({ staff, security, appointments });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 // Register Staff
 /**
