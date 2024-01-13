@@ -1129,24 +1129,18 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  *                 properties:
  *                   name:
  *                     type: string
- *                   company:
- *                     type: string
- *                   purpose:
- *                     type: string
- *                   phoneNo:
- *                     type: string
  *                   date:
  *                     type: string
  *                     format: date
  *                   time:
  *                     type: string
- *                   verification:
- *                     type: boolean
  *                   staff:
  *                     type: object
  *                     properties:
  *                       username:
  *                         type: string
+ *                   verification:
+ *                     type: boolean
  *       '403':
  *         description: Forbidden - Invalid or unauthorized token
  *         content:
@@ -1162,7 +1156,7 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  *               type: string
  *               example: Error retrieving appointments
  */
-app.get('/appointments', authenticateToken, async (req, res) => {
+app.get('/appointments', authenticateTokenForSecurity, async (req, res) => {
   const { name } = req.query;
   const { role } = req.user;
 
@@ -1174,6 +1168,7 @@ app.get('/appointments', authenticateToken, async (req, res) => {
 
   appointmentDB
     .find(filter)
+    .project({ name: 1, date: 1, time: 1, 'staff.username': 1, verification: 1 }) // Include only necessary fields
     .toArray()
     .then((appointments) => {
       res.json(appointments);
@@ -1182,6 +1177,7 @@ app.get('/appointments', authenticateToken, async (req, res) => {
       res.status(500).send('Error retrieving appointments');
     });
 });
+
 
 
 // Logout
