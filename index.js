@@ -923,7 +923,7 @@ app.post('/appointments', async (req, res) => {
     }
 
     // Fetch the staff based on staffId
-    const staff = await staffDB.findOne({ _id: staffId });
+    const staff = await staffDB.findOne({ staffId });
 
     if (!staff) {
       return res.status(400).json({ error: 'Bad request - Invalid staffId or staff not found' });
