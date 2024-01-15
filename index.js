@@ -857,8 +857,11 @@ app.post('/change-password', async (req, res) => {
  *                 type: string
  *               verification:
  *                 type: boolean
- *               staffId:
- *                 type: string
+ *               staff:
+ *                 type: object
+ *                 properties:
+ *                   staffId:
+ *                     type: number
  *     responses:
  *       '200':
  *         description: Appointment created successfully
@@ -891,8 +894,8 @@ app.post('/appointments', async (req, res) => {
     date,
     time,
     verification,
-    staffId,
-  } = req.body;
+    staff: { staffId },
+      } = req.body;
 
   try {
     // Fetch the staff based on staffId
@@ -910,7 +913,7 @@ app.post('/appointments', async (req, res) => {
       date,
       time,
       verification,
-      staff: { staffId: staff._id },  
+      staff: { staffId},  
     };
 
     await appointmentDB.insertOne(appointment);
