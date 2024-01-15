@@ -871,7 +871,7 @@ app.post('/change-password', async (req, res) => {
  *                   - staffId
  *                 properties:
  *                   staffId:
- *                     type: string
+ *                     type: number
  *     responses:
  *       '200':
  *         description: Appointment created successfully
