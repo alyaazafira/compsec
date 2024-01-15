@@ -827,8 +827,6 @@ app.post('/change-password', async (req, res) => {
   }
 });
 
-    // Create appointment
-
 /**
  * @swagger
  * /appointments:
@@ -842,6 +840,15 @@ app.post('/change-password', async (req, res) => {
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - name
+ *               - company
+ *               - purpose
+ *               - phoneNo
+ *               - date
+ *               - time
+ *               - verification
+ *               - staff
  *             properties:
  *               name:
  *                 type: string
@@ -859,9 +866,11 @@ app.post('/change-password', async (req, res) => {
  *                 type: boolean
  *               staff:
  *                 type: object
+ *                 required:
+ *                   - staffId
  *                 properties:
  *                   staffId:
- *                     type: number
+ *                     type: string
  *     responses:
  *       '200':
  *         description: Appointment created successfully
@@ -870,12 +879,12 @@ app.post('/change-password', async (req, res) => {
  *             schema:
  *               type: string
  *       '400':
- *         description: Bad request - Invalid staffId or staff not found
+ *         description: Bad request - Invalid input data or staffId not found
  *         content:
  *           text/plain:
  *             schema:
  *               type: string
- *               example: Invalid staffId. Staff not found.
+ *               example: Bad request - Invalid input data
  *       '500':
  *         description: Internal Server Error - Error creating appointment
  *         content:
@@ -884,6 +893,8 @@ app.post('/change-password', async (req, res) => {
  *               type: string
  *               example: Error creating appointment
  */
+
+const { ObjectId } = require('mongodb');
 
 app.post('/appointments', async (req, res) => {
   const {
@@ -895,14 +906,19 @@ app.post('/appointments', async (req, res) => {
     time,
     verification,
     staff: { staffId },
-      } = req.body;
+  } = req.body;
 
   try {
+    // Additional validation 
+    if (!name || !company || !purpose || !phoneNo || !date || !time || verification === undefined || !staffId) {
+      return res.status(400).send('Bad request - Invalid input data');
+    }
+
     // Fetch the staff based on staffId
     const staff = await staffDB.findOne({ _id: ObjectId(staffId) });
 
     if (!staff) {
-      return res.status(400).send('Invalid staffId. Staff not found.');
+      return res.status(400).send('Bad request - Invalid staffId or staff not found');
     }
 
     const appointment = {
@@ -913,17 +929,18 @@ app.post('/appointments', async (req, res) => {
       date,
       time,
       verification,
-      staff: { staffId},  
+      staff: { staffId },
     };
 
+    // Perform the database operation (consider using transactions)
     await appointmentDB.insertOne(appointment);
+
     res.status(200).send('Appointment created successfully');
   } catch (error) {
     console.error(error);
-    res.status(500).send('Error creating appointment');
+    res.status(500).send(`Error creating appointment: ${error.message}`);
   }
 });
-
 
     // Get staff's appointments
 /**
