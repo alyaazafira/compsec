@@ -827,6 +827,7 @@ app.post('/change-password', async (req, res) => {
   }
 });
 
+//create visitor appointment
 /**
  * @swagger
  * /appointments:
@@ -894,8 +895,6 @@ app.post('/change-password', async (req, res) => {
  *               example: Error creating appointment
  */
 
-const { ObjectId } = require('mongodb');
-
 app.post('/appointments', async (req, res) => {
   const {
     name,
@@ -915,7 +914,7 @@ app.post('/appointments', async (req, res) => {
     }
 
     // Fetch the staff based on staffId
-    const staff = await staffDB.findOne({ _id: new ObjectId(staffId) });
+    const staff = await staffDB.findOne({ _id: staffId });
 
     if (!staff) {
       return res.status(400).send('Bad request - Invalid staffId or staff not found');
@@ -941,6 +940,7 @@ app.post('/appointments', async (req, res) => {
     res.status(500).send(`Error creating appointment: ${error.message}`);
   }
 });
+
 
     // Get staff's appointments
 /**
