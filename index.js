@@ -1108,14 +1108,17 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
   }
 
   try {
-    // Fetch the staff information based on the requesting username
-    const staff = await staffDB.findOne({ username: requestingUsername });
+    // Fetch the appointment details to get the staff assigned to it
+    const appointment = await appointmentDB.findOne({ name });
+
+    if (!appointment) {
+      return res.status(500).send('Error update appointment. Appointment not found');
+    }
+    const { staff } = appointment;
 
     // Check if the staff making the request matches the assigned staff for the appointment
-    const appointment = await appointmentDB.findOne({ name, 'staff.staffId': staff.staffId, 'staff.username': staff.username });
-    
-    if (!appointment) {
-      return res.status(403).send('Invalid or unauthorized token. Cannot update appointments of other staff');
+    if (staff.username !== requestingUsername) {
+      return res.status(403).send('Invalid or unauthorized token. Cannot updade appointments of other staff');
     }
 
     // Continue with updating appointment verification
