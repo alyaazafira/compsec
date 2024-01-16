@@ -997,6 +997,11 @@ app.post('/appointments', async (req, res) => {
  *                     type: string
  *                   verification:
  *                     type: boolean
+ *                   staff:
+ *                     type: object
+ *                     properties:
+ *                       staffId:
+ *                         type: number
  *                
  *       '403':
  *         description: Forbidden - Invalid or unauthorized token
@@ -1014,27 +1019,27 @@ app.post('/appointments', async (req, res) => {
  *               example: Error retrieving appointments
  */
 
-    app.get('/staff-appointments/:staffId', authenticateToken, async (req, res) => {
-      const { staffId } = req.params;
-      const { role } = req.user;
-    
-      if (role !== 'staff') {
-        return res.status(403).send('Invalid or unauthorized token');
-      }
-    
-      appointmentDB
-        .find({ 'staff.staffId': staffId })
-        .toArray()
-        .then((appointments) => {
-          res.json(appointments);
-        })
-        .catch((error) => {
-          res.status(500).send('Error retrieving appointments');
-        });
+app.get('/staff-appointments/:staffId', authenticateToken, async (req, res) => {
+  const { staffId } = req.params;
+  const { role } = req.user;
+
+  if (role !== 'staff') {
+    return res.status(403).send('Invalid or unauthorized token');
+  }
+
+  appointmentDB
+    .find({ 'staff.staffId': parseInt(staffId) }) // Ensure staffId is converted to a number
+    .toArray()
+    .then((appointments) => {
+      res.json(appointments);
+    })
+    .catch((error) => {
+      res.status(500).send('Error retrieving appointments');
     });
+});
 
-// Update appointment verification by visitor name
 
+//// Update appointment verification by visitor name
 /**
  * @swagger
  * /appointments/{name}:
