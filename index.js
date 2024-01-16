@@ -989,11 +989,11 @@ app.post('/appointments', async (req, res) => {
  *       - BearerAuth: []
  *     parameters:
  *       - in: path
- *         name: username
- *         description: Username of the staff member
+ *         name: staffId
+ *         description: Id of the staff member
  *         required: true
  *         schema:
- *           type: string
+ *           type: number
  *     responses:
  *       '200':
  *         description: Appointments retrieved successfully
