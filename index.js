@@ -976,7 +976,7 @@ app.post('/appointments', async (req, res) => {
 });
 
 
-    // Get staff's appointments
+////// Get staff's appointments
 /**
  * @swagger
  * /staff-appointments/{username}:
@@ -1019,11 +1019,7 @@ app.post('/appointments', async (req, res) => {
  *                     type: string
  *                   verification:
  *                     type: boolean
- *                   staff:
- *                     type: object
- *                     properties:
- *                       username:
- *                         type: string
+ *                
  *       '403':
  *         description: Forbidden - Invalid or unauthorized token
  *         content:
@@ -1040,8 +1036,8 @@ app.post('/appointments', async (req, res) => {
  *               example: Error retrieving appointments
  */
 
-    app.get('/staff-appointments/:username', authenticateToken, async (req, res) => {
-      const { username } = req.params;
+    app.get('/staff-appointments/:staffId', authenticateToken, async (req, res) => {
+      const { staffId } = req.params;
       const { role } = req.user;
     
       if (role !== 'staff') {
@@ -1049,7 +1045,7 @@ app.post('/appointments', async (req, res) => {
       }
     
       appointmentDB
-        .find({ 'staff.username': username })
+        .find({ 'staff.staffId': staffId })
         .toArray()
         .then((appointments) => {
           res.json(appointments);
