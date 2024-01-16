@@ -1101,21 +1101,32 @@ app.get('/staff-appointments/:staffId', authenticateToken, async (req, res) => {
 app.put('/appointments/:name', authenticateToken, async (req, res) => {
   const { name } = req.params;
   const { verification } = req.body;
-  const { role } = req.user;
+  const { role, username: requestingUsername } = req.user;
 
   if (role !== 'staff') {
     return res.status(403).send('Invalid or unauthorized token');
   }
 
-  appointmentDB
-    .updateOne({ name }, { $set: { verification } })
-    .then(() => {
-      res.status(200).send('Appointment verification updated successfully');
-    })
-    .catch((error) => {
-      res.status(500).send('Error updating appointment verification');
-    });
+  try {
+    // Fetch the staff information based on the requesting username
+    const staff = await staffDB.findOne({ username: requestingUsername });
+
+    // Check if the staff making the request matches the assigned staff for the appointment
+    const appointment = await appointmentDB.findOne({ name, 'staff.staffId': staff.staffId, 'staff.username': staff.username });
+    
+    if (!appointment) {
+      return res.status(403).send('Invalid or unauthorized token. Cannot update appointments of other staff');
+    }
+
+    // Continue with updating appointment verification
+    await appointmentDB.updateOne({ name }, { $set: { verification } });
+    res.status(200).send('Appointment verification updated successfully');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error updating appointment verification');
+  }
 });
+
 
     // Delete appointment
 // Delete appointment
