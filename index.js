@@ -874,7 +874,7 @@ app.get('/staff-appointments/:staffId', authenticateToken, async (req, res) => {
 ///staff update verification////
 /**
  * @swagger
- * /appointments/{name}:
+ * /UPDATEappointments/{name}:
  *   put:
  *     summary: Update Appointment Verification
  *     description: Update the verification status of an appointment by name
@@ -924,7 +924,7 @@ app.get('/staff-appointments/:staffId', authenticateToken, async (req, res) => {
  *             schema:
  *               type: string
  */
-app.put('/appointments/:name', authenticateToken, async (req, res) => {
+app.put('/UPDATEappointments/:name', authenticateToken, async (req, res) => {
   const { name } = req.params;
   const { verification } = req.body;
   const { role, username: requestingUsername } = req.user;
@@ -942,11 +942,11 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
       return res.status(500).send('Error updating appointment. Appointment not found');
     }
     
-    const { staff } = appointment; 
+    const { staff } = appointment;
 
     // Check if the staff making the request matches the assigned staff for the appointment
-    if (!staff || staff.username !== requestingUsername) {
-      return res.status(403).send('Invalid or unauthorized token. Cannot update appointments of other staff');
+    if (staff.username !== requestingUsername) {
+      return res.status(403).send('Invalid or unauthorized token. Cannot UPDATE appointments of other staff');
     }
 
     // Continue with updating appointment verification
