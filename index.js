@@ -1044,7 +1044,6 @@ app.get('/staff-appointments/:staffId', authenticateToken, async (req, res) => {
   }
 });
 
-//// Update appointment verification by visitor name
 /**
  * @swagger
  * /appointments/{name}:
@@ -1103,17 +1102,19 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
   const { verification } = req.body;
   const { role, username: requestingUsername } = req.user;
 
-  if (role !== 'staff') {
-    return res.status(403).send('Invalid or unauthorized token');
-  }
-
   try {
+    // Ensure only staff can access this route
+    if (role !== 'staff') {
+      return res.status(403).send('Invalid or unauthorized token');
+    }
+
     // Fetch the appointment details to get the staff assigned to it
     const appointment = await appointmentDB.findOne({ name });
 
     if (!appointment) {
       return res.status(500).send('Error updating appointment. Appointment not found');
     }
+
     const { staff } = appointment;
 
     // Check if the staff making the request matches the assigned staff for the appointment
@@ -1129,8 +1130,6 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
     res.status(500).send('Error updating appointment verification');
   }
 });
-
-
 
     // Delete appointment
 // Delete appointment
