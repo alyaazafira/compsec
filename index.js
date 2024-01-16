@@ -979,7 +979,7 @@ app.post('/appointments', async (req, res) => {
 ////// Get staff's appointments
 /**
  * @swagger
- * /staff-appointments/{username}:
+ * /staff-appointments/{staffId}:
  *   get:
  *     summary: Get Staff Appointments
  *     description: Retrieve appointments for a specific staff member
