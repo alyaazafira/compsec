@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
+const passwordValidator = require('password-validator');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -65,6 +66,30 @@ const authenticateTokenForSecurity = (req, res, next) => {
     next();
   });
 };
+
+// Create a password schema for strong passwords
+const passwordSchema = new passwordValidator();
+
+// Add password rules (minimum length of 8 characters, at least one uppercase letter, one lowercase letter, one digit, and one special character)
+passwordSchema
+  .is().min(8)
+  .has().uppercase()
+  .has().lowercase()
+  .has().digits()
+  .has().symbols();
+
+// Middleware function to validate password strength
+const validatePasswordStrength = (req, res, next) => {
+  const { password } = req.body;
+
+  // Validate the password against the schema
+  if (!passwordSchema.validate(password)) {
+    return res.status(400).json({ error: 'Bad request - Weak password. Password must be at least 8 characters long and include uppercase, lowercase, digit, and special character.' });
+  }
+
+  next();
+};
+
 // Middleware for authentication and authorization (specifically for admin role)
 const authenticateTokenForAdmin = (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -1247,8 +1272,6 @@ app.get('/appointments', authenticateTokenForSecurity, async (req, res) => {
       res.status(500).send('Error retrieving appointments');
     });
 });
-
-
 
 // Logout
 
