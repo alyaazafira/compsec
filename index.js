@@ -1117,10 +1117,10 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
 
     const { staff } = appointment;
 
-    // Check if the staff making the request matches the assigned staff for the appointment
-  if (!staff || staff.username !== requestingUsername) {
-    return res.status(403).send('Invalid or unauthorized token. Cannot update appointments of other staff');
-}
+    if (!staff || staff.staffId !== requestingUsername) {
+      return res.status(403).send('Invalid or unauthorized token. Cannot update appointments of other staff');
+    }
+    
 
     // Continue with updating appointment verification
     await appointmentDB.updateOne({ name }, { $set: { verification } });
