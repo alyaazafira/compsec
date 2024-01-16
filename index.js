@@ -1002,7 +1002,6 @@ app.post('/appointments', async (req, res) => {
  *                     properties:
  *                       staffId:
  *                         type: number
- *                
  *       '403':
  *         description: Forbidden - Invalid or unauthorized token
  *         content:
@@ -1021,42 +1020,31 @@ app.post('/appointments', async (req, res) => {
 
 app.get('/staff-appointments/:staffId', authenticateToken, async (req, res) => {
   const { staffId } = req.params;
-  const { role } = req.user;
+  const { role, username: requestingUsername } = req.user;
 
   if (role !== 'staff') {
     return res.status(403).send('Invalid or unauthorized token');
   }
 
-  appointmentDB
-    .find({ 'staff.staffId': parseInt(staffId) }) // Ensure staffId is converted to a number
-    .toArray()
-    .then((appointments) => {
-      res.json(appointments);
-    })
-    .catch((error) => {
-      res.status(500).send('Error retrieving appointments');
-    });
-});
+  try {
+    // Fetch the staff information based on staffId
+    const staff = await staffDB.findOne({ staffId: parseInt(staffId) });
 
+    // Check if the staff making the request matches the assigned staff for the appointment
+    if (!staff || staff.username !== requestingUsername) {
+      return res.status(403).send('Invalid or unauthorized token. Cannot get appointments of other staff');
+    }
 
-app.get('/staff-appointments/:staffId', authenticateToken, async (req, res) => {
-  const { staffId } = req.params;
-  const { role, staffId: userStaffId, username: requestingUsername } = req.user;
-
-  if (role !== 'staff' || parseInt(staffId) !== userStaffId || username !== requestingUsername) {
-    return res.status(403).send('Invalid or unauthorized token');
+    // Continue with fetching appointments
+    const appointments = await appointmentDB.find({ 'staff.staffId': staff.staffId }).toArray();
+    res.json(appointments);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error retrieving appointments');
   }
-
-  appointmentDB
-    .find({ 'staff.staffId': parseInt(staffId) })
-    .toArray()
-    .then((appointments) => {
-      res.json(appointments);
-    })
-    .catch((error) => {
-      res.status(500).send('Error retrieving appointments');
-    });
 });
+
+
 
 //// Update appointment verification by visitor name
 /**
