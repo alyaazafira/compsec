@@ -1021,6 +1021,26 @@ app.post('/appointments', async (req, res) => {
 
 app.get('/staff-appointments/:staffId', authenticateToken, async (req, res) => {
   const { staffId } = req.params;
+  const { role } = req.user;
+
+  if (role !== 'staff') {
+    return res.status(403).send('Invalid or unauthorized token');
+  }
+
+  appointmentDB
+    .find({ 'staff.staffId': parseInt(staffId) }) // Ensure staffId is converted to a number
+    .toArray()
+    .then((appointments) => {
+      res.json(appointments);
+    })
+    .catch((error) => {
+      res.status(500).send('Error retrieving appointments');
+    });
+});
+
+
+app.get('/staff-appointments/:staffId', authenticateToken, async (req, res) => {
+  const { staffId } = req.params;
   const { role, staffId: userStaffId, username: requestingUsername } = req.user;
 
   if (role !== 'staff' || parseInt(staffId) !== userStaffId || username !== requestingUsername) {
