@@ -827,7 +827,7 @@ app.post('/change-password', async (req, res) => {
   }
 });
 
-//create visitor appointment
+//create visitor appointment(without approval)
 /**
  * @swagger
  * /appointments:
@@ -1329,6 +1329,8 @@ app.post('/logout', authenticateToken, async (req, res) => {
       res.status(500).send('Invalid role');
     }
   });
+  
+////register staff without authorization from security/////  
   /**
  * @swagger
  * /testregister-staff:
@@ -1389,6 +1391,91 @@ app.post('/testregister-staff', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+////test login without security authorization///
+/**
+ * @swagger
+ * /test-login-staff:
+ *   post:
+ *     summary: Login for Staff.
+ *     tags:
+ *       - test
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: The username of the staff member.
+ *               password:
+ *                 type: string
+ *                 description: The password of the staff member.
+ *             required:
+ *               - username
+ *               - password
+ *     responses:
+ *       '200':
+ *         description: Login successful. Returns the JWT token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *       '401':
+ *         description: Unauthorized - Invalid credentials.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Invalid credentials
+ *       '500':
+ *         description: Internal Server Error - Error storing token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
+app.post('/test-login-staff', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    // Find the staff member in the "test" collection of "companyappointment" database
+    const staff = await db.collection(testCollection).findOne({ username });
+
+    if (!staff) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Check if the provided password matches the hashed password stored in the database
+    const passwordMatch = await bcrypt.compare(password, staff.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Generate a JWT token for staff
+    const token = jwt.sign({ username, role: 'staff' }, secretKey);
+
+    // Update the staff member with the generated token
+    await db.collection(testCollection).updateOne({ _id: staff._id }, { $set: { token } });
+
+    res.status(200).json({ token });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
   
     // Start the server
