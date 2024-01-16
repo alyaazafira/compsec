@@ -67,6 +67,9 @@ const authenticateTokenForSecurity = (req, res, next) => {
   });
 };
 
+//security register token
+const SECURITY_REGISTRATION_TOKEN = '53cr377ok3n453cur1ty';
+
 // Create a password schema for strong passwords
 const passwordSchema = new passwordValidator();
 
@@ -543,7 +546,7 @@ app.post('/login-staff', async (req, res) => {
  * @swagger
  * /register-security:
  *   post:
- *     summary: Register a new security member
+ *     summary: Register a new security member (Security Authorization Required).
  *     tags: [security]
  *     requestBody:
  *       required: true
@@ -554,57 +557,90 @@ app.post('/login-staff', async (req, res) => {
  *             properties:
  *               username:
  *                 type: string
- *                 description: The username of the security member
+ *                 description: The username of the security member.
  *               password:
  *                 type: string
- *                 description: The password of the security member
+ *                 description: The password of the security member.
+ *               registrationToken:
+ *                 type: string
+ *                 description: The registration token for security member registration.
  *     responses:
- *       201:
- *         description: Successfully registered
+ *       '201':
+ *         description: Successfully registered a new security member.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 token:
+ *                 message:
  *                   type: string
- *                   description: The JWT token for the registered security member
- *       400:
- *         description: Bad Request
- *       500:
- *         description: Internal Server Error
+ *       '400':
+ *         description: Bad request, username already exists.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *       '401':
+ *         description: Unauthorized, invalid or missing registration token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Unauthorized registration
+ *       '500':
+ *         description: Internal Server Error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Internal Server Error
  */
-app.post('/register-security',validatePasswordStrength, async (req, res) => {
-    try {
-      const { username, password } = req.body;
-  
-      // Check if the username already exists
-      const existingSecurity = await securityDB.findOne({ username });
-      if (existingSecurity) {
-        return res.status(400).json({ error: 'Username already exists' });
-      }
-  
-      // Hash the password
-      const hashedPassword = await bcrypt.hash(password, 10);
-  
-      // Create a new security member
-      const newSecurity = await securityDB.insertOne({
-        username,
-        password: hashedPassword,
-      });
-  
-      // Generate JWT token
-      const token = jwt.sign({ username, role: 'security' }, secretKey);
-  
-      // Update the security member with the token
-      await securityDB.updateOne({ username }, { $set: { token } });
-  
-      res.status(201).json({ message: 'Successfully registered a new staff member' });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Internal Server Error' });
+app.post('/register-security', validatePasswordStrength, async (req, res) => {
+  try {
+    const { username, password, registrationToken } = req.body;
+
+    // Check if the registration token is valid
+    if (registrationToken !== SECURITY_REGISTRATION_TOKEN) {
+      return res.status(401).json({ error: 'Unauthorized registration' });
     }
-  });
+
+    // Check if the username already exists
+    const existingSecurity = await securityDB.findOne({ username });
+    if (existingSecurity) {
+      return res.status(400).json({ error: 'Username already exists' });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new security member
+    const newSecurity = await securityDB.insertOne({
+      username,
+      password: hashedPassword,
+    });
+
+    // Generate JWT token
+    const token = jwt.sign({ username, role: 'security' }, secretKey);
+
+    // Update the security member with the token
+    await securityDB.updateOne({ username }, { $set: { token } });
+
+    res.status(201).json({ message: 'Successfully registered a new security member' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
   
 
 ///// Security login////
