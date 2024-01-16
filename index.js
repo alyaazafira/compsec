@@ -1044,6 +1044,7 @@ app.get('/staff-appointments/:staffId', authenticateToken, async (req, res) => {
   }
 });
 
+///staff update verification////
 /**
  * @swagger
  * /appointments/{name}:
@@ -1084,7 +1085,7 @@ app.get('/staff-appointments/:staffId', authenticateToken, async (req, res) => {
  *             schema:
  *               type: string
  *       '403':
- *         description: Forbidden - Invalid or unauthorized token
+ *         description: Forbidden - Invalid or unauthorized token or attempting to update other staff's appointments
  *         content:
  *           text/plain:
  *             schema:
@@ -1117,10 +1118,10 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
 
     const { staff } = appointment;
 
-    if (!staff || staff.staffId !== requestingUsername) {
+    // Check if the staff making the request matches the assigned staff for the appointment
+    if (!staff || staff.username !== requestingUsername) {
       return res.status(403).send('Invalid or unauthorized token. Cannot update appointments of other staff');
     }
-    
 
     // Continue with updating appointment verification
     await appointmentDB.updateOne({ name }, { $set: { verification } });
