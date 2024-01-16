@@ -121,13 +121,6 @@ const authenticateTokenForAdmin = (req, res, next) => {
 *       bearerFormat: JWT
 */
  
-/**
- * @swagger
- * tags:
- *   name: admin
- *   description: APIs for admin
- */
-
  /**
  * @swagger
  * tags:
@@ -148,172 +141,6 @@ const authenticateTokenForAdmin = (req, res, next) => {
  *   name: visitor 
  *   description: APIs for visitor 
  */
-//register admin
-/**
- * @swagger
- * /register-admin:
- *   post:
- *     summary: Register a new admin
- *     tags: [admin]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *                 description: The username for the new admin.
- *               password:
- *                 type: string
- *                 description: The password for the new admin.
- *             required:
- *               - username
- *               - password
- *     responses:
- *       '201':
- *         description: Successfully registered a new admin.
- *       '400':
- *         description: Bad request, username already exists.
- *       '500':
- *         description: Internal Server Error.
- */
-app.post('/register-admin', validatePasswordStrength, async (req, res) => {
-  const { username, password } = req.body;
-
-  try {
-    // Check if the username already exists for admin
-    const existingAdmin = await db.collection('admin').findOne({ username });
-
-    if (existingAdmin) {
-      return res.status(400).json({ error: 'Username already exists' });
-    }
-
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create a new admin
-    const newAdmin = {
-      username,
-      password: hashedPassword,
-    };
-
-    // Insert the new admin into the "admin" collection of "companyappointment" database
-    await db.collection('admin').insertOne(newAdmin);
-
-    res.status(201).json({ message: 'Successfully registered a new admin' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-//login admin
-
-/**
- * @swagger
- * /login-admin:
- *   post:
- *     summary: Admin Login
- *     description: Authenticate admin with username and password
- *     tags: [admin]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *               password:
- *                 type: string
- *     responses:
- *       '200':
- *         description: Login successful
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 token:
- *                   type: string
- *       '401':
- *         description: Unauthorized - Invalid credentials
- *       '500':
- *         description: Internal Server Error - Error storing token
- */
-app.post('/login-admin', async (req, res) => {
-  const { username, password } = req.body;
-
-  const admin = await db.collection('admin').findOne({ username });
-
-  if (!admin) {
-    return res.status(401).send('Invalid credentials');
-  }
-
-  const passwordMatch = await bcrypt.compare(password, admin.password);
-
-  if (!passwordMatch) {
-    return res.status(401).send('Invalid credentials');
-  }
-
-  // Generate a new token for the admin
-  const newToken = jwt.sign({ username, role: 'admin' }, secretKey);
-
-  // Update the admin's token in the database
-  db.collection('admin')
-    .updateOne({ username }, { $set: { token: newToken } })
-    .then(() => {
-      res.status(200).json({ token: newToken });
-    })
-    .catch(() => {
-      res.status(500).send('Error storing token');
-    });
-});
-
-
-
-//admin see data
-/**
- * @swagger
- * /admin/data:
- *   get:
- *     summary: Get all data for admin
- *     description: Retrieve all data including staff, security, and appointment information.
- *     tags: [admin]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       '200':
- *         description: Successfully retrieved all data for admin.
- *       '401':
- *         description: Unauthorized - Invalid or missing token.
- *       '403':
- *         description: Forbidden - User does not have admin privileges.
- *       '500':
- *         description: Internal Server Error.
- */
-app.get('/admin/data', authenticateTokenForAdmin, async (req, res) => {
-  try {
-    // Fetch all data from staff, security, and appointment collections
-    const staffData = await db.collection('staff').find({}).toArray();
-    const securityData = await db.collection('security').find({}).toArray();
-    const appointmentData = await db.collection('appointment').find({}).toArray();
-
-    const allData = {
-      staff: staffData,
-      security: securityData,
-      appointment: appointmentData,
-    };
-
-    res.status(200).json(allData);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
 
 
 // Register Staff
@@ -1045,6 +872,7 @@ app.get('/staff-appointments/:staffId', authenticateToken, async (req, res) => {
 });
 
 ///staff update verification////
+// Staff update verification
 /**
  * @swagger
  * /appointments/{name}:
@@ -1097,7 +925,6 @@ app.get('/staff-appointments/:staffId', authenticateToken, async (req, res) => {
  *             schema:
  *               type: string
  */
-
 app.put('/appointments/:name', authenticateToken, async (req, res) => {
   const { name } = req.params;
   const { verification } = req.body;
@@ -1115,7 +942,9 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
     if (!appointment) {
       return res.status(500).send('Error updating appointment. Appointment not found');
     }
-    const { staff } = staff;
+    
+    const { staff } = appointment; 
+
     // Check if the staff making the request matches the assigned staff for the appointment
     if (!staff || staff.username !== requestingUsername) {
       return res.status(403).send('Invalid or unauthorized token. Cannot update appointments of other staff');
@@ -1129,7 +958,6 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
     res.status(500).send('Error updating appointment verification');
   }
 });
-
 
     // Delete appointment
 // Delete appointment
@@ -1185,7 +1013,7 @@ app.delete('/appointments/:name', authenticateToken, async (req, res) => {
       return res.status(500).send('Error deleting appointment. Appointment not found');
     }
 
-    const { staff } = appointment;
+    const { staff } = staff;
 
     // Check if the staff making the request matches the assigned staff for the appointment
     if (!staff || staff.username !== requestingUsername) {
