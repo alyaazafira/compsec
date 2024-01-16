@@ -1002,6 +1002,8 @@ app.post('/appointments', async (req, res) => {
  *                     properties:
  *                       staffId:
  *                         type: number
+ *                       username:
+ *                         type: string
  *                
  *       '403':
  *         description: Forbidden - Invalid or unauthorized token
@@ -1021,14 +1023,14 @@ app.post('/appointments', async (req, res) => {
 
 app.get('/staff-appointments/:staffId', authenticateToken, async (req, res) => {
   const { staffId } = req.params;
-  const { role } = req.user;
+  const { role, username } = req.user;
 
-  if (role !== 'staff') {
+  if (role !== 'staff' || staffId !== req.user.staffId) {
     return res.status(403).send('Invalid or unauthorized token');
   }
 
   appointmentDB
-    .find({ 'staff.staffId': parseInt(staffId) }) // Ensure staffId is converted to a number
+    .find({ 'staff.staffId': parseInt(staffId), 'staff.username': username }) // Ensure staffId is converted to a number
     .toArray()
     .then((appointments) => {
       res.json(appointments);
@@ -1037,7 +1039,6 @@ app.get('/staff-appointments/:staffId', authenticateToken, async (req, res) => {
       res.status(500).send('Error retrieving appointments');
     });
 });
-
 
 //// Update appointment verification by visitor name
 /**
