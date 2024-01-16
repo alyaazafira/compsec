@@ -574,6 +574,7 @@ app.post('/login-staff', async (req, res) => {
  *               properties:
  *                 message:
  *                   type: string
+ *                   example: Successfully registered a new security member
  *       '400':
  *         description: Bad request, username already exists.
  *         content:
@@ -583,6 +584,7 @@ app.post('/login-staff', async (req, res) => {
  *               properties:
  *                 error:
  *                   type: string
+ *                   example: Username already exists
  *       '401':
  *         description: Unauthorized, invalid or missing registration token.
  *         content:
