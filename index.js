@@ -1044,8 +1044,6 @@ app.get('/staff-appointments/:staffId', authenticateToken, async (req, res) => {
   }
 });
 
-
-
 //// Update appointment verification by visitor name
 /**
  * @swagger
