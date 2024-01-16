@@ -1117,7 +1117,7 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
     const { staff } = appointment;
 
     // Check if the staff making the request matches the assigned staff for the appointment
-    if (staff.username !== requestingUsername) {
+    if (!staff || staff.username !== requestingUsername) {
       return res.status(403).send('Invalid or unauthorized token. Cannot update appointments of other staff');
     }
 
@@ -1189,7 +1189,7 @@ app.delete('/appointments/:name', authenticateToken, async (req, res) => {
     const { staff } = appointment;
 
     // Check if the staff making the request matches the assigned staff for the appointment
-    if (staff.username !== requestingUsername) {
+    if (!staff || staff.username !== requestingUsername) {
       return res.status(403).send('Invalid or unauthorized token. Cannot delete appointments of other staff');
     }
 
