@@ -270,68 +270,7 @@ app.post('/login-admin', async (req, res) => {
     });
 });
 
-//admin can see everythings
-/**
- * @swagger
- * /admin/see-everything:
- *   get:
- *     summary: View all information (staff, security, and appointments)
- *     tags: [admin]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       '200':
- *         description: Successfully retrieved all information.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 staff:
- *                   type: array
- *                   description: List of staff members.
- *                   items:
- *                     type: object
- *                     properties:
- *                       // Define staff properties here
- *                 security:
- *                   type: array
- *                   description: List of security details.
- *                   items:
- *                     type: object
- *                     properties:
- *                       // Define security properties here
- *                 appointments:
- *                   type: array
- *                   description: List of appointments.
- *                   items:
- *                     type: object
- *                     properties:
- *                       // Define appointment properties here
- *       '401':
- *         description: Unauthorized - Invalid or missing token.
- *       '403':
- *         description: Forbidden - User does not have admin privileges.
- *       '500':
- *         description: Internal Server Error.
- */
-app.get('/admin/see-everything', authenticateTokenForAdmin, async (req, res) => {
-  try {
-    // Retrieve all staff members
-    const staff = await db.collection('staff').find().toArray();
 
-    // Retrieve all security details
-    const security = await db.collection('security').find().toArray();
-
-    // Retrieve all appointments
-    const appointments = await db.collection('appointments').find().toArray();
-
-    res.status(200).json({ staff, security, appointments });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
 
 //admin see data
 /**
@@ -599,6 +538,7 @@ app.post('/login-staff', async (req, res) => {
     });
 });
 
+////register security////
 /**
  * @swagger
  * /register-security:
@@ -667,7 +607,7 @@ app.post('/register-security',validatePasswordStrength, async (req, res) => {
   });
   
 
-// Security login
+///// Security login////
 /**
  * @swagger
  * /login-security:
@@ -748,7 +688,7 @@ const authenticateToken = (req, res, next) => {
     next();
   });
 };
-
+/////change password/////
 /**
  * @swagger
  * /change-password:
@@ -1130,12 +1070,13 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
 });
 
     // Delete appointment
+// Delete appointment
 /**
  * @swagger
  * /appointments/{name}:
  *   delete:
  *     summary: Delete Appointment
- *     description: Delete an appointment by name
+ *     description: Delete an appointment by name. Only the staff member assigned to the appointment can delete it.
  *     tags: [staff]
  *     security:
  *       - BearerAuth: []
@@ -1153,43 +1094,57 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
  *           text/plain:
  *             schema:
  *               type: string
+ *       '403':
+ *         description: Forbidden - Invalid or unauthorized token or attempting to delete other staff's appointments
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
  *       '500':
  *         description: Internal Server Error - Error deleting appointment
  *         content:
  *           text/plain:
  *             schema:
  *               type: string
- *       '403':
- *         description: Forbidden - Invalid or unauthorized token
- *         content:
- *           text/plain:
- *             schema:
- *               type: string
- *       '401':
- *         description: Unauthorized - Missing token
- *         content:
- *           text/plain:
- *             schema:
- *               type: string
  */
+app.delete('/appointments/:name', authenticateToken, async (req, res) => {
+  const { name } = req.params;
+  const { role, username: requestingUsername } = req.user;
 
-    app.delete('/appointments/:name', authenticateToken, async (req, res) => {
-      const { name } = req.params;
-      const { role } = req.user;
-    
-      if (role !== 'staff') {
-        return res.status(403).send('Invalid or unauthorized token');
-      }
-    
-      appointmentDB
-        .deleteOne({ name })
-        .then(() => {
-          res.status(200).send('Appointment deleted successfully');
-        })
-        .catch((error) => {
-          res.status(500).send('Error deleting appointment');
-        });
-    });
+  if (role !== 'staff') {
+    return res.status(403).send('Invalid or unauthorized token');
+  }
+
+  try {
+    // Fetch the appointment details to get the staff assigned to it
+    const appointment = await appointmentDB.findOne({ name });
+
+    if (!appointment) {
+      return res.status(500).send('Error deleting appointment. Appointment not found');
+    }
+
+    const { staff } = appointment;
+
+    // Check if the staff making the request matches the assigned staff for the appointment
+    if (staff.username !== requestingUsername) {
+      return res.status(403).send('Invalid or unauthorized token. Cannot delete appointments of other staff');
+    }
+
+    // If the staff matches, proceed with deleting the appointment
+    appointmentDB
+      .deleteOne({ name })
+      .then(() => {
+        res.status(200).send('Appointment deleted successfully');
+      })
+      .catch((error) => {
+        res.status(500).send('Error deleting appointment');
+      });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error deleting appointment');
+  }
+});
+
 
 // Get all appointments (for security)
 /**
