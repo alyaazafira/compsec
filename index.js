@@ -176,7 +176,7 @@ const authenticateTokenForAdmin = (req, res, next) => {
  *       '500':
  *         description: Internal Server Error.
  */
-app.post('/register-admin', async (req, res) => {
+app.post('/register-admin', validatePasswordStrength, async (req, res) => {
   const { username, password } = req.body;
 
   try {
@@ -466,7 +466,7 @@ app.get('/admin/data', authenticateTokenForAdmin, async (req, res) => {
  *                   type: string
  *                   example: Internal Server Error
  */
-app.post('/register-staff', authenticateTokenForSecurity, async (req, res) => {
+app.post('/register-staff', authenticateTokenForSecurity, validatePasswordStrength, async (req, res) => {
   const { role } = req.user;
 
   if (role !== 'security') {
@@ -634,7 +634,7 @@ app.post('/login-staff', async (req, res) => {
  *       500:
  *         description: Internal Server Error
  */
-app.post('/register-security', async (req, res) => {
+app.post('/register-security',validatePasswordStrength, async (req, res) => {
     try {
       const { username, password } = req.body;
   
@@ -807,7 +807,7 @@ const authenticateToken = (req, res, next) => {
  *                   type: string
  *                   example: Error updating password
  */
-app.post('/change-password', async (req, res) => {
+app.post('/change-password', validatePasswordStrength, async (req, res) => {
   const { username, role, oldPassword, newPassword } = req.body;
 
   let user;
@@ -1385,7 +1385,7 @@ app.post('/logout', authenticateToken, async (req, res) => {
  *       '500':
  *         description: Internal Server Error.
  */
-app.post('/testregister-staff', async (req, res) => {
+app.post('/testregister-staff', validatePasswordStrength, async (req, res) => {
   const { username, password } = req.body;
 
   try {
