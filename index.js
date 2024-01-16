@@ -1115,9 +1115,7 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
     if (!appointment) {
       return res.status(500).send('Error updating appointment. Appointment not found');
     }
-
-    const { staff } = appointment;
-
+    const { staff } = staff;
     // Check if the staff making the request matches the assigned staff for the appointment
     if (!staff || staff.username !== requestingUsername) {
       return res.status(403).send('Invalid or unauthorized token. Cannot update appointments of other staff');
@@ -1131,6 +1129,7 @@ app.put('/appointments/:name', authenticateToken, async (req, res) => {
     res.status(500).send('Error updating appointment verification');
   }
 });
+
 
     // Delete appointment
 // Delete appointment
