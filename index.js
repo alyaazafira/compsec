@@ -1013,7 +1013,8 @@ app.delete('/appointments/:name', authenticateToken, async (req, res) => {
       return res.status(500).send('Error deleting appointment. Appointment not found');
     }
 
-    const { staff } = appointment;
+   // Fetch the staff details based on the requesting username
+   const staff = await staffDB.findOne({ username: requestingUsername });
 
     // Check if the staff making the request matches the assigned staff for the appointment
     if (staff.username !== requestingUsername) {
