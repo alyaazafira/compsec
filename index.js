@@ -5,11 +5,34 @@ const jwt = require('jsonwebtoken');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const passwordValidator = require('password-validator');
+const ipAccessControl = require('express-ip-access-control');
 
 const app = express();
 const port = process.env.PORT || 3000;
 const secretKey = 'officevisitor';
 
+// Specify the allowed IP addresses
+const allowedIPs = [
+  '20.187.161.206',
+  '20.24.120.5',
+  '20.24.120.33',
+  '20.24.122.12',
+  '20.24.122.25',
+  '20.24.122.143',
+  '20.24.240.207',
+  '20.255.205.96',
+  '20.255.205.114',
+  '20.255.205.124',
+  '20.255.205.183',
+  '20.255.205.227',
+  '20.205.69.86',
+];
+
+// Define the IP access control rules
+const accessControl = ipAccessControl(allowedIPs);
+
+// Apply the IP access control middleware to all routes
+app.use(accessControl);
 // MongoDB connection URL
 const mongoURL =
   'mongodb+srv://alyaazafira:4pp0intmentv1s170r@alyaa.emy970i.mongodb.net/?retryWrites=true&w=majority';
