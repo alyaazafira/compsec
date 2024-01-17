@@ -942,7 +942,8 @@ app.put('/UPDATEappointments/:name', authenticateToken, async (req, res) => {
       return res.status(500).send('Error updating appointment. Appointment not found');
     }
     
-    const staff = await staffDB.findOne({ username });
+    // Fetch the staff details based on the requesting username
+    const staff = await staffDB.findOne({ username: requestingUsername });
 
     // Check if the staff making the request matches the assigned staff for the appointment
     if (!staff || staff.username !== requestingUsername) {
