@@ -942,14 +942,11 @@ app.put('/UPDATEappointments/:name', authenticateToken, async (req, res) => {
       return res.status(500).send('Error updating appointment. Appointment not found');
     }
     
-    const { staffid } = appointment;
+    const staff = await staffDB.findOne({ username });
 
-    // Fetch the staff information based on staffid (assuming there's a function to do this)
-    const staff = await getStaffByStaffId(staffid);
-    
     // Check if the staff making the request matches the assigned staff for the appointment
     if (!staff || staff.username !== requestingUsername) {
-      return res.status(403).send('Invalid or unauthorized token. Cannot UPDATE appointments of other staff');
+      return res.status(403).send('Invalid or unauthorized token. Cannot update appointments of other staff');
     }
 
     // Continue with updating appointment verification
