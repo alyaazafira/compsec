@@ -871,7 +871,6 @@ app.get('/staff-appointments/:staffId', authenticateToken, async (req, res) => {
   }
 });
 
-///staff update verification////
 /**
  * @swagger
  * /UPDATEappointments/{name}:
@@ -881,7 +880,7 @@ app.get('/staff-appointments/:staffId', authenticateToken, async (req, res) => {
  *     tags: 
  *        - staff
  *     security:
- *       - BearerAuth: []
+ *       - BearerAuth: []  // Assumes Bearer token authentication
  *     parameters:
  *       - in: path
  *         name: name
@@ -930,8 +929,12 @@ app.put('/UPDATEappointments/:name', authenticateToken, async (req, res) => {
   const { role, username: requestingUsername } = req.user;
 
   try {
+    // Log request details for debugging
+    console.log('Request Details - Name:', name, 'Verification:', verification, 'Requesting Username:', requestingUsername);
+
     // Ensure only staff can access this route
     if (role !== 'staff') {
+      console.log('Access Denied: Invalid or unauthorized token. Role:', role);
       return res.status(403).send('Invalid or unauthorized token');
     }
 
@@ -939,13 +942,18 @@ app.put('/UPDATEappointments/:name', authenticateToken, async (req, res) => {
     const appointment = await appointmentDB.findOne({ name });
 
     if (!appointment) {
+      console.log('Error: Appointment not found for name:', name);
       return res.status(500).send('Error updating appointment. Appointment not found');
     }
     
     const { staff } = appointment;
 
+    // Log staff details for debugging
+    console.log('Staff Assigned to Appointment - Username:', staff.username, 'Requesting Username:', requestingUsername);
+
     // Check if the staff making the request matches the assigned staff for the appointment
     if (staff.username !== requestingUsername) {
+      console.log('Access Denied: Invalid or unauthorized token. Cannot UPDATE appointments of other staff');
       return res.status(403).send('Invalid or unauthorized token. Cannot UPDATE appointments of other staff');
     }
 
@@ -954,6 +962,7 @@ app.put('/UPDATEappointments/:name', authenticateToken, async (req, res) => {
     res.status(200).send('Appointment verification updated successfully');
   } catch (error) {
     console.error(error);
+    console.log('Error updating appointment verification:', error.message);
     res.status(500).send('Error updating appointment verification');
   }
 });
